@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 5 · La Biología del Presente</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#F5F2EC;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+  .card{background:#fff;border-radius:16px;max-width:680px;width:100%;padding:2rem;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+  .header{margin-bottom:1.5rem}
+  .tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.6px;padding:4px 12px;border-radius:20px;background:#E8F0EB;color:#2C4A3E;margin-bottom:.75rem;text-transform:uppercase}
+  .title{font-size:1.15rem;font-weight:700;color:#1A2E28;margin-bottom:.25rem}
+  .subtitle{font-size:13px;color:#7A8A80}
+  .progress-wrap{margin-bottom:1.5rem}
+  .progress-bar{height:4px;background:#E5E2DC;border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;background:#2C4A3E;border-radius:4px;transition:width .4s ease}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:#9A9A90;margin-top:.4rem}
+  .qtype{font-size:10px;letter-spacing:.5px;color:#9A9A90;text-transform:uppercase;margin-bottom:.4rem}
+  .stem{font-size:15px;line-height:1.7;color:#1A2E28;margin-bottom:1.25rem;font-weight:500}
+  .options{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+  .opt{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 1rem;border-radius:10px;border:1.5px solid #E0DDD6;cursor:pointer;transition:all .2s;background:#FAFAF8}
+  .opt:hover{border-color:#2C4A3E;background:#F0F5F2}
+  .opt.selected{border-color:#2C4A3E;background:#E8F0EB}
+  .opt.correct{border-color:#2C7A3C;background:#E6F4EC}
+  .opt.wrong{border-color:#A32D2D;background:#FAEAEA}
+  .opt.show-correct{border-color:#2C7A3C;background:#E6F4EC}
+  .letter{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid #C0BDB6;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#6A6A60}
+  .opt.selected .letter{border-color:#2C4A3E;color:#2C4A3E;background:#fff}
+  .opt.correct .letter{border-color:#2C7A3C;color:#2C7A3C;background:#fff}
+  .opt.wrong .letter{border-color:#A32D2D;color:#A32D2D;background:#fff}
+  .opt.show-correct .letter{border-color:#2C7A3C;color:#2C7A3C;background:#fff}
+  .opt-text{font-size:13.5px;line-height:1.55;color:#2A2A22;padding-top:2px}
+  .explain{border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.25rem;font-size:13px;line-height:1.6;display:none}
+  .explain.correct{background:#E6F4EC;border-left:3px solid #2C7A3C;color:#1A4A28}
+  .explain.wrong{background:#FAEAEA;border-left:3px solid #A32D2D;color:#5A1A1A}
+  .explain strong{font-weight:600}
+  .btn{padding:.75rem 1.5rem;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
+  .btn-check{background:#2C4A3E;color:#fff;width:100%}
+  .btn-check:hover{background:#1A3530}
+  .btn-check:disabled{background:#C0BDB6;cursor:not-allowed}
+  .btn-next{background:#2C4A3E;color:#fff;width:100%;margin-top:.6rem}
+  .btn-next:hover{background:#1A3530}
+  .results{text-align:center}
+  .score-big{font-size:3.5rem;font-weight:800;color:#2C4A3E;line-height:1}
+  .score-label{font-size:14px;color:#7A8A80;margin-top:.25rem;margin-bottom:1rem}
+  .perf{font-size:1rem;font-weight:700;color:#1A2E28;margin-bottom:.25rem}
+  .perf-sub{font-size:13px;color:#6A7A70;margin-bottom:1.5rem;line-height:1.5}
+  .breakdown{display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;flex-wrap:wrap}
+  .bk{background:#F5F2EC;border-radius:10px;padding:.75rem 1.25rem;min-width:120px}
+  .bk-n{font-size:1.5rem;font-weight:700}
+  .bk-n.g{color:#2C7A3C}
+  .bk-n.r{color:#A32D2D}
+  .bk-l{font-size:11px;color:#7A8A80;margin-top:.15rem}
+  .divider{height:1px;background:#E5E2DC;margin:1.25rem 0}
+  .detail-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;font-size:13px;color:#4A5A50}
+  .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+  .btn-restart{background:#E8F0EB;color:#2C4A3E;width:100%;margin-top:.75rem}
+  .btn-restart:hover{background:#D0DDD6}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="tag">Conversación 5</div>
+    <div class="title">La Biología del Presente</div>
+    <div class="subtitle">Relaciones · Soledad · Culpa y Responsabilidad · 10 preguntas</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-meta"><span id="qnum">Pregunta 1 de 10</span><span id="scoreshow">0 correctas</span></div>
+  </div>
+  <div id="root"></div>
+</div>
+<script>
+const Q=[
+  {
+    tipo:"Comprensión directa",
+    stem:"Según el capítulo 5, ¿cuál es la causa principal de que una persona experimente soledad dentro de una relación de pareja?",
+    opts:["La falta de comunicación efectiva entre los miembros de la pareja","La incapacidad del otro para satisfacer las necesidades emocionales propias","Relacionarse desde la identidad separada, buscando en el otro lo que uno cree que le falta","La ausencia de momentos de intimidad física y emocional compartidos","La distancia geográfica o los compromisos laborales que reducen el tiempo juntos"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> El capítulo argumenta que la soledad no surge de lo que el otro hace o deja de hacer, sino de relacionarse desde el 'yo separado' — la creencia de que uno es incompleto y necesita al otro para completarse. Las opciones A, B, D y E describen factores externos o conductuales que el texto expresamente descarta como causas reales."
+  },
+  {
+    tipo:"Inferencia",
+    stem:"El capítulo describe el caso de José, quien remitió una esclerosis múltiple. David concluye que no fue lo que José hizo, sino su manera de relacionarse con la situación, lo que permitió la transformación. ¿Qué implica esto para la comprensión habitual de la causalidad en salud?",
+    opts:["Que los tratamientos médicos convencionales son ineficaces ante enfermedades crónicas","Que la actitud positiva es suficiente para curar cualquier enfermedad si se mantiene con constancia","Que el factor determinante en la salud no es la acción externa sino la calidad de presencia con la que se vive la experiencia","Que existen casos excepcionales de remisión espontánea que la ciencia no puede explicar","Que el estrés es el único factor que desencadena enfermedades autoinmunes"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> El caso de José ilustra la proposición central: no es la conducta específica (medicamento, dieta, ejercicio) sino el modo de estar — la presencia, la aceptación — lo que activa el médico interno. A distorsiona el argumento hacia una crítica a la medicina. B trivializa la idea con el cliché del 'pensamiento positivo'. D y E son afirmaciones que el texto no hace."
+  },
+  {
+    tipo:"Razonamiento crítico",
+    stem:"El capítulo afirma que 'la soledad es una sensación falsa: nadie está separado de nada'. ¿Cuál de las siguientes afirmaciones, si fuera verdadera, debilitaría más directamente este argumento?",
+    opts:["La mayoría de las personas reporta sentirse sola al menos una vez por semana","Estudios de neuroimagen muestran que el dolor social activa las mismas regiones cerebrales que el dolor físico","La experiencia de separación es una construcción lingüística y no refleja ninguna realidad ontológica","La conciencia individual es, por definición, un fenómeno irreduciblemente privado al que ningún otro ser tiene acceso directo","Las tradiciones contemplativas de distintas culturas también describen una sensación de unidad subyacente"],
+    ans:3,
+    explain:"<strong>D es la que más debilita.</strong> Si la conciencia individual es irreductiblemente privada, entonces la separación no es una 'sensación falsa' sino una condición estructural de la existencia. A solo muestra frecuencia, no validez ontológica. B habla del dolor social pero no refuta la tesis sobre la separación. C en realidad apoya la tesis del libro. E la refuerza."
+  },
+  {
+    tipo:"Supuesto",
+    stem:"El autor sostiene que 'la finalidad de toda relación es compartir plenitud y felicidad — no que el otro me haga feliz'. Para que esta afirmación sea válida, ¿qué debe suponerse como verdadero?",
+    opts:["Que la felicidad es un estado que se construye progresivamente a través de las relaciones","Que toda persona tiene acceso, en potencia, a un estado de plenitud que no depende del otro","Que las relaciones saludables requieren un equilibrio entre dar y recibir","Que la dependencia emocional es una patología tratable con intervención psicológica","Que compartir requiere necesariamente la presencia física del otro"],
+    ans:1,
+    explain:"<strong>B es el supuesto necesario.</strong> Si la plenitud dependiera del otro para existir, sería imposible 'compartirla' — solo podría buscarse. La afirmación solo tiene sentido si uno ya posee (o puede acceder a) esa plenitud de forma autónoma. A implica un proceso acumulativo que contradice la idea. C y D son afirmaciones externas al argumento. E es irrelevante."
+  },
+  {
+    tipo:"Análisis de distinción conceptual",
+    stem:"El capítulo establece una distinción entre culpa y responsabilidad. ¿Cuál de las siguientes opciones captura mejor esa distinción según el texto?",
+    opts:["La culpa implica una sanción legal; la responsabilidad, una consecuencia moral","La culpa mira al pasado y bloquea; la responsabilidad es libre de desenlace y actúa desde el presente","La culpa es una emoción; la responsabilidad, una decisión racional","La culpa surge de errores propios; la responsabilidad, de errores ajenos que uno asume","La culpa paraliza a las personas introvertidas; la responsabilidad moviliza a las extrovertidas"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> El texto dice explícitamente que 'la culpa siempre está ligada a un evento pasado o futuro, mientras que la responsabilidad es libre de cualquier desenlace'. Es una distinción temporal y funcional: la culpa opera en el tiempo narrativo (pasado/futuro); la responsabilidad opera en el presente. Las demás opciones introducen categorías que el capítulo no usa."
+  },
+  {
+    tipo:"Inferencia filosófica",
+    stem:"Sergi Torres afirma que cuando dos personas dejan de defenderse y pasan a 'estar siendo', la relación se convierte en 'una expresión de la misma conciencia'. ¿Qué concepción de la identidad subyace a esta afirmación?",
+    opts:["La identidad es un constructo social que se negocia en cada interacción","El yo individual es una ilusión útil que puede disolverse en estados de meditación profunda","La identidad personal separada es una capa superpuesta sobre una conciencia compartida más fundamental","La autoestima sólida permite relacionarse sin necesidad de defensas","El yo se construye en relación con el otro: sin relación, no hay identidad"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> La afirmación de Torres implica que debajo de la identidad separada existe una conciencia común de la que los individuos son expresiones. Esto contrasta con el 'yo separado' que el capítulo critica. A remite al construccionismo social. B confunde la tesis con la práctica meditativa como técnica. D habla de autoestima, concepto ausente en el texto. E es la posición relacional clásica, distinta a la del libro."
+  },
+  {
+    tipo:"Análisis de metáfora",
+    stem:"El capítulo usa la metáfora de la abeja y la flor para ilustrar la polinización como un patrón perfecto que ocurre independientemente de las quejas de los participantes. ¿Cuál es la función argumentativa de esta metáfora?",
+    opts:["Mostrar que la naturaleza es indiferente al sufrimiento humano","Ilustrar que los conflictos relacionales son inevitables pero superables","Argumentar que existe un orden que se cumple al margen del estado interno de los participantes, lo que cuestiona la necesidad de la lucha como motor del cambio","Demostrar que las relaciones humanas deben modelarse según los patrones de la naturaleza","Sugerir que la evolución biológica explica los patrones de conducta en las relaciones"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> La metáfora sirve para ilustrar que el 'patrón perfecto' — la polinización, la vida — se realiza con independencia de que los participantes estén en modo supervivencia o presencia. Su función es debilitar la creencia de que la lucha, la queja o el control son necesarios para que las cosas funcionen. Las otras opciones distorsionan o amplían la metáfora más allá de su uso en el texto."
+  },
+  {
+    tipo:"Síntesis entre capítulos",
+    stem:"Los capítulos 1 y 5 convergen en rechazar que la situación externa sea la causa del deterioro. ¿Qué aporte específico hace el capítulo 5 respecto al capítulo 1 en la comprensión de cómo sana el organismo?",
+    opts:["El capítulo 5 introduce la dimensión relacional: no solo la relación con la situación propia, sino la calidad de presencia en el vínculo con otros afecta la biología","El capítulo 5 reemplaza el concepto de médico interno por el de conciencia colectiva","El capítulo 5 demuestra que la sanación requiere romper relaciones tóxicas","El capítulo 5 añade que el ejercicio físico es un complemento necesario a la presencia","El capítulo 5 corrige al capítulo 1 al afirmar que la epigenética no explica la remisión de enfermedades"],
+    ans:0,
+    explain:"<strong>A es correcta.</strong> El capítulo 1 establece que el modo de relacionarse con la propia situación activa o desactiva el médico interno. El capítulo 5 extiende esa lógica al vínculo con otros: relacionarse desde la plenitud en lugar del yo separado también tiene efectos biológicos. B, C, D y E introducen afirmaciones que el texto no hace o que directamente contradicen."
+  },
+  {
+    tipo:"Aplicación",
+    stem:"Una persona dice: 'Cada vez que mi pareja llega tarde, me siento abandonada y reacciono con silencio durante días'. Aplicando el marco del capítulo 5, ¿cuál sería la lectura más coherente de esta situación?",
+    opts:["La pareja necesita mejorar su gestión del tiempo para no activar la inseguridad de la otra persona","La persona está respondiendo desde su historia de abandono, lo cual es completamente comprensible y debe procesarse en terapia","La persona está relacionándose desde el yo separado: interpreta la llegada tarde como confirmación de que el otro no la completa, activando la biología de supervivencia","La solución está en establecer acuerdos explícitos de horarios para reducir la incertidumbre","La reacción de silencio es una estrategia de regulación emocional que necesita ser reemplazada por comunicación asertiva"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> El capítulo 5 diría que el problema no es la llegada tarde (situación externa) sino que la persona se relaciona desde la creencia de que necesita al otro para sentirse completa. La llegada tarde activa esa carencia percibida, no el abandono real. A culpa al otro. B es una lectura terapéutica válida pero externa al marco del libro. D y E proponen soluciones conductuales que el texto no privilegia."
+  },
+  {
+    tipo:"Síntesis y evaluación crítica",
+    stem:"El capítulo afirma que 'la finalidad de toda relación es compartir plenitud y felicidad'. Evalúa: ¿es esta proposición compatible con la afirmación de que la soledad es una sensación falsa?",
+    opts:["No son compatibles: si la soledad es falsa, no hay necesidad de relaciones para compartir nada","Son compatibles: si uno ya es pleno, las relaciones no añaden nada nuevo sino que expresan esa plenitud; la soledad como carencia es falsa porque la plenitud es siempre accesible","Son compatibles solo en contextos de meditación o práctica espiritual avanzada","Son compatibles si se acepta que compartir plenitud requiere primero haber sufrido su ausencia","No son compatibles: compartir implica reciprocidad, lo que supone dos seres separados con necesidades distintas"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> Ambas afirmaciones son coherentes dentro del marco del libro: si la plenitud es la condición natural del ser (no algo que se construye), entonces la soledad como 'falta de algo' es efectivamente falsa. Las relaciones no sirven para llenar un vacío sino para expresar lo que ya se es. A malinterpreta 'falsa' como 'inexistente como experiencia'. C reduce el argumento a un contexto espiritual que el texto no restringe. D y E introducen condiciones que el capítulo no establece."
+  }
+];
+
+let cur=0,score=0,answered=false,results=[];
+
+function pct(){return Math.round(((cur)/Q.length)*100)}
+
+function render(){
+  const q=Q[cur];
+  document.getElementById('prog').style.width=pct()+'%';
+  document.getElementById('qnum').textContent=`Pregunta ${cur+1} de ${Q.length}`;
+  document.getElementById('scoreshow').textContent=`${score} correcta${score!==1?'s':''}`;
+  document.getElementById('root').innerHTML=`
+    <div class="qtype">${q.tipo}</div>
+    <div class="stem">${q.stem}</div>
+    <div class="options" id="opts">
+      ${q.opts.map((o,i)=>`
+        <div class="opt" id="opt${i}" onclick="select(${i})">
+          <div class="letter">${'ABCDE'[i]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>
+    <div class="explain" id="exp"></div>
+    <button class="btn btn-check" id="btnCheck" onclick="check()" disabled>Confirmar respuesta</button>
+    <button class="btn btn-next" id="btnNext" onclick="next()" style="display:none">${cur<Q.length-1?'Siguiente →':'Ver resultados →'}</button>
+  `;
+}
+
+let sel=-1;
+function select(i){
+  if(answered)return;
+  sel=i;
+  document.querySelectorAll('.opt').forEach((el,j)=>{
+    el.classList.toggle('selected',j===i);
+  });
+  document.getElementById('btnCheck').disabled=false;
+}
+
+function check(){
+  if(answered||sel<0)return;
+  answered=true;
+  const q=Q[cur];
+  const ok=sel===q.ans;
+  if(ok)score++;
+  results.push({ok});
+  document.querySelectorAll('.opt').forEach((el,j)=>{
+    el.classList.remove('selected');
+    if(j===q.ans)el.classList.add(ok&&j===sel?'correct':'show-correct');
+    if(!ok&&j===sel)el.classList.add('wrong');
+  });
+  const exp=document.getElementById('exp');
+  exp.className='explain '+(ok?'correct':'wrong');
+  exp.innerHTML=(ok?'✓ Correcto. ':'✗ Incorrecto. ')+q.explain;
+  exp.style.display='block';
+  document.getElementById('btnCheck').style.display='none';
+  document.getElementById('btnNext').style.display='block';
+  document.getElementById('scoreshow').textContent=`${score} correcta${score!==1?'s':''}`;
+}
+
+function next(){
+  cur++;answered=false;sel=-1;
+  if(cur>=Q.length)renderResults();
+  else render();
+}
+
+function renderResults(){
+  const pctS=Math.round((score/Q.length)*100);
+  let perf,sub;
+  if(pctS>=90){perf='Excepcional';sub='Dominio sólido de la Conversación 5. Comprensión conceptual y capacidad inferencial de alto nivel.'}
+  else if(pctS>=70){perf='Competente';sub='Buena comprensión general. Revisa las preguntas de inferencia filosófica y síntesis entre capítulos.'}
+  else if(pctS>=50){perf='En desarrollo';sub='Conceptos centrales entendidos. Refuerza la distinción culpa/responsabilidad y la idea de yo separado.'}
+  else{perf='Necesita revisión';sub='Vuelve a la Conversación 5, especialmente los conceptos de soledad, plenitud y el caso de José.'}
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('qnum').textContent='Completado';
+  document.getElementById('scoreshow').textContent=`${score} de ${Q.length}`;
+  document.getElementById('root').innerHTML=`
+    <div class="results">
+      <div class="score-big">${pctS}%</div>
+      <div class="score-label">${score} de ${Q.length} respuestas correctas</div>
+      <div class="perf">${perf}</div>
+      <div class="perf-sub">${sub}</div>
+      <div class="divider"></div>
+      <div style="text-align:left;margin-bottom:1rem">
+        <div style="font-size:12px;color:#9A9A90;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Detalle por pregunta</div>
+        ${results.map((r,i)=>`
+          <div class="detail-row">
+            <div class="dot" style="background:${r.ok?'#2C7A3C':'#A32D2D'}"></div>
+            <span>P${i+1}</span>
+            <span style="font-size:11px;color:#9A9A90">${Q[i].tipo}</span>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-restart" onclick="restart()">↺ Reiniciar quiz</button>
+    </div>`;
+}
+
+function restart(){cur=0;score=0;answered=false;sel=-1;results=[];render();}
+render();
+</script>
+</body>
+</html>
