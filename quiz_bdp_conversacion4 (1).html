@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 4 · La Biología del Presente · Spring Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&family=Jost:wght@300;400;500;600&family=Forum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --marron: #514236;
+    --turquesa: #2F5D62;
+    --turquesa-light: #4A6D70;
+    --turquesa-aireado: #608D93;
+    --dorado: #C9A84C;
+    --dorado-light: #E8D5A3;
+    --cream: #F9F5EF;
+    --cream-dark: #EDE6D8;
+    --texto: #2C2C2C;
+    --texto-sec: #514236;
+    --blanco: #FFFFFF;
+    --correct-bg: #E1F0EF;
+    --incorrect-bg: #F5E8E8;
+    --correct: #2F5D62;
+    --incorrect: #8B3A3A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Forum', Georgia, serif; background: var(--cream); color: var(--texto); min-height: 100vh; }
+
+  .header {
+    background: var(--marron); padding: 2rem 1.5rem 1.5rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -40px; left: -40px;
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+  .logo-area { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .logo-svg { width: 40px; height: 40px; }
+  .brand-name { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.8rem; letter-spacing: 0.3em; color: var(--dorado-light); text-transform: uppercase; }
+  .brand-line { width: 1px; height: 28px; background: rgba(201,168,76,0.4); }
+  .brand-sub { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.7rem; letter-spacing: 0.25em; color: rgba(232,213,163,0.7); text-transform: uppercase; }
+  .header h1 { font-family: 'Julius Sans One', sans-serif; font-size: 1.45rem; color: var(--dorado-light); letter-spacing: 0.04em; margin-bottom: 0.3rem; font-weight: 400; }
+  .header .sub { font-family: 'Jost', sans-serif; font-size: 0.78rem; color: rgba(232,213,163,0.75); letter-spacing: 0.15em; text-transform: uppercase; }
+  .conv-badge {
+    display: inline-block; margin-top: 0.6rem;
+    font-family: 'Jost', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em;
+    text-transform: uppercase; background: rgba(201,168,76,0.18);
+    color: var(--dorado-light); padding: 0.3rem 0.9rem; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .main { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .chapter-intro {
+    background: var(--turquesa); color: var(--cream);
+    border-radius: 14px; padding: 1.5rem 1.75rem; margin-bottom: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .chapter-intro::after {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chapter-intro h2 { font-family: 'Julius Sans One', sans-serif; font-size: 1.15rem; font-weight: 400; color: var(--dorado-light); margin-bottom: 0.4rem; letter-spacing: 0.04em; }
+  .chapter-intro p { font-family: 'Jost', sans-serif; font-size: 0.84rem; color: rgba(249,245,239,0.85); line-height: 1.6; }
+
+  .progress-area { margin-bottom: 1.75rem; }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .progress-label { font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--turquesa-light); }
+  .progress-count { font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 500; color: var(--marron); }
+  .progress-bar { height: 4px; background: var(--cream-dark); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--turquesa), var(--dorado)); border-radius: 4px; transition: width 0.5s ease; width: 0%; }
+
+  .question-card { background: var(--blanco); border-radius: 16px; border: 1px solid var(--cream-dark); padding: 1.75rem; margin-bottom: 1.25rem; box-shadow: 0 2px 12px rgba(81,66,54,0.06); transition: border-color 0.3s; }
+  .question-card.answered { border-color: var(--dorado-light); }
+  .q-number { font-family: 'Jost', sans-serif; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--turquesa-aireado); margin-bottom: 0.75rem; }
+  .q-type-badge { display: inline-block; font-family: 'Jost', sans-serif; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; background: var(--cream); color: var(--turquesa); border: 1px solid var(--turquesa-aireado); padding: 0.2rem 0.5rem; border-radius: 20px; margin-left: 0.5rem; }
+  .q-text { font-family: 'Forum', Georgia, serif; font-size: 1rem; line-height: 1.7; color: var(--texto); margin-bottom: 1.25rem; }
+
+  .options { display: flex; flex-direction: column; gap: 0.6rem; }
+  .option-btn { display: flex; align-items: flex-start; gap: 0.75rem; background: var(--cream); border: 1.5px solid var(--cream-dark); border-radius: 10px; padding: 0.85rem 1rem; cursor: pointer; text-align: left; transition: all 0.25s; width: 100%; }
+  .option-btn:hover:not(:disabled) { border-color: var(--turquesa-light); background: rgba(47,93,98,0.05); }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .option-btn.incorrect { background: var(--incorrect-bg); border-color: var(--incorrect); }
+  .option-btn.missed { background: rgba(201,168,76,0.08); border-color: var(--dorado); }
+  .option-letter { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--blanco); border: 1.5px solid var(--cream-dark); display: flex; align-items: center; justify-content: center; font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--turquesa); transition: all 0.25s; }
+  .option-btn.correct .option-letter { background: var(--correct); border-color: var(--correct); color: white; }
+  .option-btn.incorrect .option-letter { background: var(--incorrect); border-color: var(--incorrect); color: white; }
+  .option-btn.missed .option-letter { background: var(--dorado); border-color: var(--dorado); color: white; }
+  .option-text { font-family: 'Jost', sans-serif; font-size: 0.87rem; line-height: 1.5; color: var(--texto); padding-top: 2px; }
+
+  .feedback { display: none; margin-top: 1rem; padding: 1rem 1.25rem; border-radius: 10px; border-left: 3px solid var(--turquesa); background: rgba(47,93,98,0.06); }
+  .feedback.show { display: block; }
+  .feedback-title { font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--turquesa); margin-bottom: 0.4rem; }
+  .feedback p { font-family: 'Jost', sans-serif; font-size: 0.84rem; line-height: 1.6; color: var(--texto-sec); }
+  .feedback.wrong-fb { border-left-color: var(--dorado); background: rgba(201,168,76,0.08); }
+  .feedback.wrong-fb .feedback-title { color: var(--marron); }
+
+  .result-panel { display: none; background: var(--blanco); border-radius: 16px; border: 1px solid var(--dorado-light); padding: 2.5rem 2rem; text-align: center; margin-top: 2rem; }
+  .result-panel.show { display: block; }
+  .result-score { font-family: 'Julius Sans One', sans-serif; font-size: 3.5rem; color: var(--turquesa); font-weight: 400; line-height: 1; margin-bottom: 0.25rem; }
+  .result-label { font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--turquesa-aireado); margin-bottom: 1.5rem; }
+  .result-message { font-family: 'Forum', serif; font-size: 1rem; color: var(--texto-sec); line-height: 1.7; max-width: 440px; margin: 0 auto 2rem; }
+  .result-bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .result-stat { background: var(--cream); border-radius: 10px; padding: 1rem; }
+  .result-stat-n { font-family: 'Julius Sans One', sans-serif; font-size: 1.8rem; color: var(--marron); font-weight: 400; }
+  .result-stat-l { font-family: 'Jost', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--turquesa-aireado); }
+  .btn-retry { background: var(--marron); color: var(--dorado-light); border: none; border-radius: 8px; padding: 0.85rem 2rem; font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.3s; }
+  .btn-retry:hover { background: #3d3029; }
+
+  .quiz-footer { text-align: center; padding: 1.5rem; font-family: 'Jost', sans-serif; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--turquesa-light); opacity: 0.7; }
+  @media (max-width: 480px) { .main { padding: 1.5rem 1rem 3rem; } .header h1 { font-size: 1.15rem; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-area">
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="12" r="5" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M40 18 C40 18 28 28 28 42 C28 52 34 56 40 56 C46 56 52 52 52 42 C52 28 40 18 40 18Z" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <path d="M40 56 L40 70" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M28 42 C22 40 18 44 20 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M52 42 C58 40 62 44 60 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="brand-name">Spring Up</div>
+      <div class="brand-sub">Atelier de Vida</div>
+    </div>
+    <div class="brand-line"></div>
+    <div><div class="brand-sub">Tercer Espacio</div></div>
+  </div>
+  <h1>La Biología del Presente</h1>
+  <p class="sub">Quiz de Comprensión</p>
+  <div class="conv-badge">Conversación 4 · Ludwig van Arquímedes</div>
+</header>
+
+<main class="main">
+
+  <div class="chapter-intro">
+    <h2>Las esferas de conocimiento, el cerebro universal y la creatividad</h2>
+    <p>Pensamientos esenciales vs. pensamientos construidos · el proceso creativo de Arquímedes · la red neuronal por defecto · la creatividad como estado de ser, no como habilidad.</p>
+  </div>
+
+  <div class="progress-area">
+    <div class="progress-info">
+      <span class="progress-label">Tu progreso</span>
+      <span class="progress-count" id="prog-count">0 / 9</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="q1">
+    <div class="q-number">Pregunta 01 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">Sergi Torres describe una experiencia de 2004 en la que su cerebro "en lugar de pensar pensamientos, recibía pensamientos". ¿Qué concepto central introduce esta experiencia en el capítulo?</p>
+    <div class="options" id="q1-opts">
+      <button class="option-btn" onclick="answer(1,0,0)"><span class="option-letter">A</span><span class="option-text">La existencia de esferas de conocimiento externas a la mente individual: fuentes de información veraz a las que el cerebro puede sintonizar, en lugar de fabricar pensamientos propios.</span></button>
+      <button class="option-btn" onclick="answer(1,1,0)"><span class="option-letter">B</span><span class="option-text">La posibilidad de la telepatía entre personas que comparten un estado emocional similar.</span></button>
+      <button class="option-btn" onclick="answer(1,2,0)"><span class="option-letter">C</span><span class="option-text">Que los estados de meditación profunda desconectan temporalmente el córtex prefrontal y liberan creatividad inconsciente.</span></button>
+      <button class="option-btn" onclick="answer(1,3,0)"><span class="option-letter">D</span><span class="option-text">Que el sueño lúcido es la puerta de acceso al conocimiento universal que el capítulo denomina "cerebro universal".</span></button>
+    </div>
+    <div class="feedback" id="q1-fb">
+      <div class="feedback-title">El cerebro como receptor, no como fabricador</div>
+      <p>Esta experiencia de Sergi inaugura el giro más radical del capítulo: y si las neuronas no estuvieran diseñadas para construir pensamientos, sino para sintonizar con esferas de conocimiento que ya existen? El cerebro pasaría de ser un generador a ser una "sucursal del conocimiento".</p>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="q2">
+    <div class="q-number">Pregunta 02 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Qué ilustra el ejemplo del sobrino de David del Rosario —que conoce la primera ley de Newton a los cuatro meses— dentro del argumento del capítulo?</p>
+    <div class="options" id="q2-opts">
+      <button class="option-btn" onclick="answer(2,0,1)"><span class="option-letter">A</span><span class="option-text">Que la inteligencia humana es principalmente innata y el entorno tiene poco efecto sobre el desarrollo cognitivo temprano.</span></button>
+      <button class="option-btn" onclick="answer(2,1,1)"><span class="option-letter">B</span><span class="option-text">Que los bebés nacen conectados al cerebro universal: poseen conocimiento que no han aprendido, lo que sugiere que el conocimiento es previo a la experiencia individual.</span></button>
+      <button class="option-btn" onclick="answer(2,2,1)"><span class="option-letter">C</span><span class="option-text">Que la física newtoniana está inscrita en el ADN humano como un instinto de supervivencia evolutivo.</span></button>
+      <button class="option-btn" onclick="answer(2,3,1)"><span class="option-letter">D</span><span class="option-text">Que la neuroplasticidad permite a los bebés aprender leyes físicas a través de la observación del entorno desde los primeros días de vida.</span></button>
+    </div>
+    <div class="feedback" id="q2-fb">
+      <div class="feedback-title">Nacemos enchufados</div>
+      <p>El sobrino no fue a la escuela a aprender física. La conocía antes. Del mismo modo los bebés inventan sistemas económicos para cromos y desarrollan sentido de justicia sin que ningún adulto guíe el proceso. El capítulo propone que esas habilidades proceden del cerebro universal: un conocimiento que precede a la experiencia individual.</p>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="q3">
+    <div class="q-number">Pregunta 03 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Cuáles son las tres etapas del proceso creativo que el capítulo identifica a través de la historia de Arquímedes?</p>
+    <div class="options" id="q3-opts">
+      <button class="option-btn" onclick="answer(3,0,2)"><span class="option-letter">A</span><span class="option-text">Inspiración → Esfuerzo → Resultado.</span></button>
+      <button class="option-btn" onclick="answer(3,1,2)"><span class="option-letter">B</span><span class="option-text">Observación → Hipótesis → Verificación experimental.</span></button>
+      <button class="option-btn" onclick="answer(3,2,2)"><span class="option-letter">C</span><span class="option-text">Preparación → Resolución espontánea → Toma de consciencia.</span></button>
+      <button class="option-btn" onclick="answer(3,3,2)"><span class="option-letter">D</span><span class="option-text">Problema → Incubación → Solución racional.</span></button>
+    </div>
+    <div class="feedback" id="q3-fb">
+      <div class="feedback-title">El orden que cambia todo</div>
+      <p>Lo revelador no son las etapas en sí, sino lo que ocurre en cada una. La preparación no sirve para resolver —sirve para crear el mapa mental del problema. La resolución llega sola, de forma espontánea, cuando Arquímedes ya ha soltado. La toma de consciencia es cuando la corteza prefrontal "caza la mariposa".</p>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="q4">
+    <div class="q-number">Pregunta 04 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Qué es la "red neuronal por defecto" y qué función cumple en el proceso creativo según el capítulo?</p>
+    <div class="options" id="q4-opts">
+      <button class="option-btn" onclick="answer(4,0,3)"><span class="option-letter">A</span><span class="option-text">Es la red que se activa cuando estamos bajo estrés intenso y el cerebro necesita tomar decisiones rápidas.</span></button>
+      <button class="option-btn" onclick="answer(4,1,3)"><span class="option-letter">B</span><span class="option-text">Es el conjunto de neuronas que procesan información sensorial del entorno mientras estamos despiertos y atentos.</span></button>
+      <button class="option-btn" onclick="answer(4,2,3)"><span class="option-letter">C</span><span class="option-text">Es el circuito de consolidación de memorias que funciona durante las fases REM del sueño profundo.</span></button>
+      <button class="option-btn" onclick="answer(4,3,3)"><span class="option-letter">D</span><span class="option-text">Es la red que trabaja en reposo, consume el 90-95% de la energía cerebral, y sirve de enlace con el cerebro universal: la que hace posible la resolución espontánea cuando soltamos el problema.</span></button>
+    </div>
+    <div class="feedback" id="q4-fb">
+      <div class="feedback-title">El cerebro trabaja más cuando "no hace nada"</div>
+      <p>Esta es una de las ideas más contraintuitivas del capítulo: la creatividad genuina no requiere esfuerzo —lo interrumpe. La red por defecto, activa en el descanso, es la que conecta con el conocimiento esencial. El estrés, la preocupación y el exceso de esfuerzo la bloquean.</p>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="q5">
+    <div class="q-number">Pregunta 05 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Cuáles son los marcadores físicos y emocionales que, según el capítulo, acompañan a un "pensamiento esencial"?</p>
+    <div class="options" id="q5-opts">
+      <button class="option-btn" onclick="answer(5,0,0)"><span class="option-letter">A</span><span class="option-text">Ligereza corporal, aumento de la capacidad pulmonar, brillo en los ojos, cosquilleos, cambio en la conductividad eléctrica de la piel y sensación de certeza absoluta.</span></button>
+      <button class="option-btn" onclick="answer(5,1,0)"><span class="option-letter">B</span><span class="option-text">Aumento del ritmo cardíaco, sudoración, tensión muscular y alerta elevada, similares a la respuesta de lucha-huida.</span></button>
+      <button class="option-btn" onclick="answer(5,2,0)"><span class="option-letter">C</span><span class="option-text">Sensación de vacío mental, silencio interior profundo y ausencia total de pensamiento durante varios minutos.</span></button>
+      <button class="option-btn" onclick="answer(5,3,0)"><span class="option-letter">D</span><span class="option-text">Euforia intensa seguida de agotamiento físico, similar a los estados descritos en las experiencias cumbre de Maslow.</span></button>
+    </div>
+    <div class="feedback" id="q5-fb">
+      <div class="feedback-title">El cuerpo sabe antes que la mente</div>
+      <p>El libro es preciso: sabes que es un pensamiento esencial "con la misma certeza que cuando encuentras al amor de tu vida." No es una vaga intuición — es inconfundible. El cuerpo lo registra antes de que la mente lo procese. Por eso si no lo capturas en ese instante, se va.</p>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="q6">
+    <div class="q-number">Pregunta 06 <span class="q-type-badge">Inferencia</span></div>
+    <p class="q-text">El capítulo afirma que "hacerse mayor es quedar atrapado en una imagen personal del mundo". ¿Qué relación tiene esto con el concepto de las esferas de conocimiento?</p>
+    <div class="options" id="q6-opts">
+      <button class="option-btn" onclick="answer(6,0,1)"><span class="option-letter">A</span><span class="option-text">Que los adultos tienen mayor capacidad de acceder al cerebro universal porque han acumulado más experiencias que expandir.</span></button>
+      <button class="option-btn" onclick="answer(6,1,1)"><span class="option-letter">B</span><span class="option-text">Que al construir una esfera de conocimiento individual —una imagen personal del mundo— nos desconectamos del conocimiento universal al que los niños accedían de forma natural.</span></button>
+      <button class="option-btn" onclick="answer(6,2,1)"><span class="option-letter">C</span><span class="option-text">Que el conocimiento individual que construimos de adultos reemplaza y supera al cerebro universal en utilidad práctica.</span></button>
+      <button class="option-btn" onclick="answer(6,3,1)"><span class="option-letter">D</span><span class="option-text">Que la madurez cognitiva es una condición necesaria para acceder a pensamientos esenciales de alta complejidad.</span></button>
+    </div>
+    <div class="feedback" id="q6-fb">
+      <div class="feedback-title">El precio de crecer</div>
+      <p>Los niños nacen enchufados. Al construir identidad y personalidad —lo que el capítulo 2 llamaba "mecanismo de supervivencia"— se aíslan del conocimiento universal. El día en que el sobrino de David "tuvo conocimiento propio", una parte de él se desconectó del universo. La personalidad tomó el control.</p>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="q7">
+    <div class="q-number">Pregunta 07 <span class="q-type-badge">Análisis</span></div>
+    <p class="q-text">El capítulo afirma que un pensamiento esencial "no es tuyo: es de todos" y que no puedes retenerlo —o lo escribes o lo pierdes. ¿Qué implica esto sobre la naturaleza de las grandes ideas creativas?</p>
+    <div class="options" id="q7-opts">
+      <button class="option-btn" onclick="answer(7,0,2)"><span class="option-letter">A</span><span class="option-text">Que la propiedad intelectual de las grandes ideas es colectiva y no debería poder patentarse.</span></button>
+      <button class="option-btn" onclick="answer(7,1,2)"><span class="option-letter">B</span><span class="option-text">Que las grandes ideas son en realidad memorias genéticas transmitidas por ancestros que ya las tuvieron antes.</span></button>
+      <button class="option-btn" onclick="answer(7,2,2)"><span class="option-letter">C</span><span class="option-text">Que las grandes ideas no son producciones del cerebro individual, sino recepciones del campo de conocimiento universal: el genio no inventa, sintoniza. Por eso son atemporales y aculturales —trascienden al individuo que las recibe.</span></button>
+      <button class="option-btn" onclick="answer(7,3,2)"><span class="option-letter">D</span><span class="option-text">Que las ideas genuinas son tan frágiles que la única forma de preservarlas es el trabajo colaborativo inmediato.</span></button>
+    </div>
+    <div class="feedback" id="q7-fb">
+      <div class="feedback-title">Beethoven no inventó: sintonizó</div>
+      <p>Por eso Beethoven cambiaba el lenguaje musical de su época y la gente se iba de la sala. Por eso Van Gogh no vendía un cuadro y hoy valen millones. La idea genuina no tiene que ver con el contexto cultural del que la recibe — viene de otro lugar. Eso la hace incomprendida en su tiempo y universal en el futuro.</p>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="q8">
+    <div class="q-number">Pregunta 08 <span class="q-type-badge">Análisis</span></div>
+    <p class="q-text">Sergi Torres afirma: "El amor y la creatividad van de la mano y son nuestro estado mental natural. Cuando no vivimos en un estado mental creativo, vivimos en un estado mental reactivo y sufrimos." ¿Qué reformulación del sufrimiento propone esta idea?</p>
+    <div class="options" id="q8-opts">
+      <button class="option-btn" onclick="answer(8,0,3)"><span class="option-letter">A</span><span class="option-text">Que el sufrimiento es una señal de que la persona necesita más tiempo para el descanso y la recuperación física.</span></button>
+      <button class="option-btn" onclick="answer(8,1,3)"><span class="option-letter">B</span><span class="option-text">Que el sufrimiento es un estado emocional que puede eliminarse con pensamiento positivo y gratitud consciente.</span></button>
+      <button class="option-btn" onclick="answer(8,2,3)"><span class="option-letter">C</span><span class="option-text">Que el sufrimiento es el resultado de circunstancias externas adversas que la persona no puede controlar.</span></button>
+      <button class="option-btn" onclick="answer(8,3,3)"><span class="option-letter">D</span><span class="option-text">Que el sufrimiento no viene de lo que ocurre, sino de estar en estado reactivo en lugar de creativo: es el precio de vivir desconectado del estado natural del ser.</span></button>
+    </div>
+    <div class="feedback" id="q8-fb">
+      <div class="feedback-title">Sufrir = estar en modo reactivo</div>
+      <p>Esta reformulación cambia todo el marco: el sufrimiento no es causado por las circunstancias, sino por el estado desde el que se viven. Reactividad = biología de supervivencia = sufrimiento. Creatividad = biología del presente = apertura. Son el mismo fenómeno visto desde ángulos distintos —uno biológico (cap. 1), otro mental (cap. 4).</p>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="q9">
+    <div class="q-number">Pregunta 09 <span class="q-type-badge">Síntesis</span></div>
+    <p class="q-text">El capítulo propone que "la penicilina y sus usos médicos ya existían previamente a su descubrimiento". ¿Qué visión del conocimiento subyace a esta afirmación y cómo conecta con la propuesta del libro?</p>
+    <div class="options" id="q9-opts">
+      <button class="option-btn" onclick="answer(9,0,0)"><span class="option-letter">A</span><span class="option-text">Que el conocimiento no es una construcción humana sino algo que existe independientemente de la mente individual: el ser humano no crea —descubre. Y para descubrir, primero hay que abrirse a la posibilidad.</span></button>
+      <button class="option-btn" onclick="answer(9,1,0)"><span class="option-letter">B</span><span class="option-text">Que la ciencia avanza inevitablemente hacia verdades predeterminadas y los científicos solo aceleran un proceso ya escrito.</span></button>
+      <button class="option-btn" onclick="answer(9,2,0)"><span class="option-letter">C</span><span class="option-text">Que el descubrimiento científico es aleatorio y depende únicamente de las condiciones materiales y tecnológicas disponibles.</span></button>
+      <button class="option-btn" onclick="answer(9,3,0)"><span class="option-letter">D</span><span class="option-text">Que las ideas importantes de la ciencia surgen solo en culturas con alto desarrollo filosófico previo.</span></button>
+    </div>
+    <div class="feedback" id="q9-fb">
+      <div class="feedback-title">Descubrir vs. inventar</div>
+      <p>Esta distinción es el fundamento de todo el capítulo: "Solo así descubres que el conocimiento ya existe de por sí, que es previo al origen de la inteligencia humana. Ser un genio es permitir que tu cerebro sea consciente de ideas inhumanas." El libro invierte el modelo: no producimos conocimiento, abrimos canal hacia él.</p>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-panel" id="result-panel">
+    <div class="result-score" id="score-display">0</div>
+    <div class="result-label">de 9 preguntas correctas</div>
+    <p class="result-message" id="result-msg"></p>
+    <div class="result-bars">
+      <div class="result-stat"><div class="result-stat-n" id="r-correct">0</div><div class="result-stat-l">Correctas</div></div>
+      <div class="result-stat"><div class="result-stat-n" id="r-wrong">0</div><div class="result-stat-l">Incorrectas</div></div>
+      <div class="result-stat"><div class="result-stat-n" id="r-pct">0%</div><div class="result-stat-l">Puntuación</div></div>
+    </div>
+    <button class="btn-retry" onclick="resetQuiz()">Volver a intentarlo</button>
+  </div>
+
+</main>
+
+<footer class="quiz-footer">Spring Up · Atelier de Vida · Tercer Espacio &nbsp;·&nbsp; La Biología del Presente · Conversación 4</footer>
+
+<script>
+  const TOTAL = 9;
+  const CORRECT = { 1:0, 2:1, 3:2, 4:3, 5:0, 6:1, 7:2, 8:3, 9:0 };
+  let answered = 0, correct = 0;
+
+  const MSGS = {
+    100: "Tu cerebro estuvo en modo receptor todo el quiz. Captaste los pensamiento esenciales del capítulo con una claridad y precisión notables.",
+    75: "Comprensión sólida. Las esferas de conocimiento, el proceso creativo y la distinción entre recibir y fabricar pensamientos están bien asentadas. Repasa los puntos donde dudaste.",
+    50: "Este capítulo propone un giro radical sobre la naturaleza del pensamiento. Vale la pena releerlo dejando que las ideas lleguen, sin forzarlas.",
+    0: "Las ideas de este capítulo están entre las más desafiantes del libro. No para entenderlas, sino para sentirlas. Te invitamos a releer y volver al quiz cuando quieras."
+  };
+
+  function getMessage(pct) {
+    if (pct === 100) return MSGS[100];
+    if (pct >= 75) return MSGS[75];
+    if (pct >= 50) return MSGS[50];
+    return MSGS[0];
+  }
+
+  function answer(qNum, chosen, correctIdx) {
+    const qId = 'q' + qNum;
+    const opts = document.getElementById(qId + '-opts').querySelectorAll('.option-btn');
+    opts.forEach(b => b.disabled = true);
+    const isOk = chosen === correctIdx;
+    opts[chosen].classList.add(isOk ? 'correct' : 'incorrect');
+    if (!isOk) opts[correctIdx].classList.add('missed');
+    const fb = document.getElementById(qId + '-fb');
+    fb.classList.add('show');
+    if (!isOk) fb.classList.add('wrong-fb');
+    document.getElementById(qId).classList.add('answered');
+    answered++;
+    if (isOk) correct++;
+    const pct = Math.round((answered / TOTAL) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-count').textContent = answered + ' / ' + TOTAL;
+    if (answered === TOTAL) setTimeout(showResult, 600);
+  }
+
+  function showResult() {
+    const pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById('score-display').textContent = correct;
+    document.getElementById('result-msg').textContent = getMessage(pct);
+    document.getElementById('r-correct').textContent = correct;
+    document.getElementById('r-wrong').textContent = TOTAL - correct;
+    document.getElementById('r-pct').textContent = pct + '%';
+    const panel = document.getElementById('result-panel');
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetQuiz() {
+    answered = 0; correct = 0;
+    document.getElementById('prog-fill').style.width = '0%';
+    document.getElementById('prog-count').textContent = '0 / ' + TOTAL;
+    document.getElementById('result-panel').classList.remove('show');
+    for (let q = 1; q <= TOTAL; q++) {
+      const qId = 'q' + q;
+      document.getElementById(qId).classList.remove('answered');
+      document.getElementById(qId + '-opts').querySelectorAll('.option-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect', 'missed');
+      });
+      const fb = document.getElementById(qId + '-fb');
+      fb.classList.remove('show', 'wrong-fb');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

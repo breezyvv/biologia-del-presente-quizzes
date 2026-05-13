@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 3 · La Biología del Presente · Spring Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&family=Jost:wght@300;400;500;600&family=Forum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --marron: #514236;
+    --turquesa: #2F5D62;
+    --turquesa-light: #4A6D70;
+    --turquesa-aireado: #608D93;
+    --dorado: #C9A84C;
+    --dorado-light: #E8D5A3;
+    --cream: #F9F5EF;
+    --cream-dark: #EDE6D8;
+    --texto: #2C2C2C;
+    --texto-sec: #514236;
+    --blanco: #FFFFFF;
+    --correct-bg: #E1F0EF;
+    --incorrect-bg: #F5E8E8;
+    --correct: #2F5D62;
+    --incorrect: #8B3A3A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Forum', Georgia, serif; background: var(--cream); color: var(--texto); min-height: 100vh; }
+
+  .header {
+    background: var(--marron);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -40px; left: -40px;
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+  .logo-area {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem; margin-bottom: 1rem;
+  }
+  .logo-svg { width: 40px; height: 40px; }
+  .brand-name {
+    font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.8rem;
+    letter-spacing: 0.3em; color: var(--dorado-light); text-transform: uppercase;
+  }
+  .brand-line { width: 1px; height: 28px; background: rgba(201,168,76,0.4); }
+  .brand-sub {
+    font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.7rem;
+    letter-spacing: 0.25em; color: rgba(232,213,163,0.7); text-transform: uppercase;
+  }
+  .header h1 {
+    font-family: 'Julius Sans One', sans-serif; font-size: 1.45rem;
+    color: var(--dorado-light); letter-spacing: 0.04em; margin-bottom: 0.3rem; font-weight: 400;
+  }
+  .header .sub {
+    font-family: 'Jost', sans-serif; font-size: 0.78rem;
+    color: rgba(232,213,163,0.75); letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .conv-badge {
+    display: inline-block; margin-top: 0.6rem;
+    font-family: 'Jost', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em;
+    text-transform: uppercase; background: rgba(201,168,76,0.18);
+    color: var(--dorado-light); padding: 0.3rem 0.9rem; border-radius: 20px;
+    border: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .main { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .chapter-intro {
+    background: var(--turquesa); color: var(--cream);
+    border-radius: 14px; padding: 1.5rem 1.75rem; margin-bottom: 2rem;
+    position: relative; overflow: hidden;
+  }
+  .chapter-intro::after {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 120px; height: 120px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chapter-intro h2 {
+    font-family: 'Julius Sans One', sans-serif; font-size: 1.15rem;
+    font-weight: 400; color: var(--dorado-light); margin-bottom: 0.4rem; letter-spacing: 0.04em;
+  }
+  .chapter-intro p {
+    font-family: 'Jost', sans-serif; font-size: 0.84rem;
+    color: rgba(249,245,239,0.85); line-height: 1.6;
+  }
+
+  .progress-area { margin-bottom: 1.75rem; }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+  .progress-label {
+    font-family: 'Jost', sans-serif; font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--turquesa-light);
+  }
+  .progress-count { font-family: 'Jost', sans-serif; font-size: 0.8rem; font-weight: 500; color: var(--marron); }
+  .progress-bar { height: 4px; background: var(--cream-dark); border-radius: 4px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--turquesa), var(--dorado));
+    border-radius: 4px; transition: width 0.5s ease; width: 0%;
+  }
+
+  .question-card {
+    background: var(--blanco); border-radius: 16px;
+    border: 1px solid var(--cream-dark); padding: 1.75rem;
+    margin-bottom: 1.25rem; box-shadow: 0 2px 12px rgba(81,66,54,0.06);
+    transition: border-color 0.3s;
+  }
+  .question-card.answered { border-color: var(--dorado-light); }
+
+  .q-number {
+    font-family: 'Jost', sans-serif; font-size: 0.65rem;
+    letter-spacing: 0.25em; text-transform: uppercase; color: var(--turquesa-aireado); margin-bottom: 0.75rem;
+  }
+  .q-type-badge {
+    display: inline-block; font-family: 'Jost', sans-serif; font-size: 0.6rem;
+    letter-spacing: 0.15em; text-transform: uppercase; background: var(--cream);
+    color: var(--turquesa); border: 1px solid var(--turquesa-aireado);
+    padding: 0.2rem 0.5rem; border-radius: 20px; margin-left: 0.5rem;
+  }
+  .q-text {
+    font-family: 'Forum', Georgia, serif; font-size: 1rem;
+    line-height: 1.7; color: var(--texto); margin-bottom: 1.25rem;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 0.6rem; }
+  .option-btn {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    background: var(--cream); border: 1.5px solid var(--cream-dark);
+    border-radius: 10px; padding: 0.85rem 1rem; cursor: pointer;
+    text-align: left; transition: all 0.25s; width: 100%;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--turquesa-light); background: rgba(47,93,98,0.05); }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .option-btn.incorrect { background: var(--incorrect-bg); border-color: var(--incorrect); }
+  .option-btn.missed { background: rgba(201,168,76,0.08); border-color: var(--dorado); }
+
+  .option-letter {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--blanco); border: 1.5px solid var(--cream-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 600;
+    color: var(--turquesa); transition: all 0.25s;
+  }
+  .option-btn.correct .option-letter { background: var(--correct); border-color: var(--correct); color: white; }
+  .option-btn.incorrect .option-letter { background: var(--incorrect); border-color: var(--incorrect); color: white; }
+  .option-btn.missed .option-letter { background: var(--dorado); border-color: var(--dorado); color: white; }
+  .option-text { font-family: 'Jost', sans-serif; font-size: 0.87rem; line-height: 1.5; color: var(--texto); padding-top: 2px; }
+
+  .feedback {
+    display: none; margin-top: 1rem; padding: 1rem 1.25rem;
+    border-radius: 10px; border-left: 3px solid var(--turquesa);
+    background: rgba(47,93,98,0.06);
+  }
+  .feedback.show { display: block; }
+  .feedback-title {
+    font-family: 'Jost', sans-serif; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--turquesa); margin-bottom: 0.4rem;
+  }
+  .feedback p { font-family: 'Jost', sans-serif; font-size: 0.84rem; line-height: 1.6; color: var(--texto-sec); }
+  .feedback.wrong-fb { border-left-color: var(--dorado); background: rgba(201,168,76,0.08); }
+  .feedback.wrong-fb .feedback-title { color: var(--marron); }
+
+  .result-panel {
+    display: none; background: var(--blanco); border-radius: 16px;
+    border: 1px solid var(--dorado-light); padding: 2.5rem 2rem;
+    text-align: center; margin-top: 2rem;
+  }
+  .result-panel.show { display: block; }
+  .result-score { font-family: 'Julius Sans One', sans-serif; font-size: 3.5rem; color: var(--turquesa); font-weight: 400; line-height: 1; margin-bottom: 0.25rem; }
+  .result-label { font-family: 'Jost', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--turquesa-aireado); margin-bottom: 1.5rem; }
+  .result-message { font-family: 'Forum', serif; font-size: 1rem; color: var(--texto-sec); line-height: 1.7; max-width: 440px; margin: 0 auto 2rem; }
+  .result-bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .result-stat { background: var(--cream); border-radius: 10px; padding: 1rem; }
+  .result-stat-n { font-family: 'Julius Sans One', sans-serif; font-size: 1.8rem; color: var(--marron); font-weight: 400; }
+  .result-stat-l { font-family: 'Jost', sans-serif; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--turquesa-aireado); }
+  .btn-retry {
+    background: var(--marron); color: var(--dorado-light); border: none;
+    border-radius: 8px; padding: 0.85rem 2rem; font-family: 'Jost', sans-serif;
+    font-size: 0.8rem; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; cursor: pointer; transition: background 0.3s;
+  }
+  .btn-retry:hover { background: #3d3029; }
+
+  .quiz-footer {
+    text-align: center; padding: 1.5rem; font-family: 'Jost', sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--turquesa-light); opacity: 0.7;
+  }
+  @media (max-width: 480px) { .main { padding: 1.5rem 1rem 3rem; } .header h1 { font-size: 1.15rem; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-area">
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="12" r="5" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M40 18 C40 18 28 28 28 42 C28 52 34 56 40 56 C46 56 52 52 52 42 C52 28 40 18 40 18Z" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <path d="M40 56 L40 70" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M28 42 C22 40 18 44 20 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M52 42 C58 40 62 44 60 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="brand-name">Spring Up</div>
+      <div class="brand-sub">Atelier de Vida</div>
+    </div>
+    <div class="brand-line"></div>
+    <div><div class="brand-sub">Tercer Espacio</div></div>
+  </div>
+  <h1>La Biología del Presente</h1>
+  <p class="sub">Quiz de Comprensión</p>
+  <div class="conv-badge">Conversación 3 · Einstein viajaba en el Halcón Milenario</div>
+</header>
+
+<main class="main">
+
+  <div class="chapter-intro">
+    <h2>Cuando el tiempo y el espacio son solo una ilusión</h2>
+    <p>El tiempo como percepción · espacio-tiempo de Einstein · neuronas espaciales · el presente real que nace con la expansión del universo · y la experiencia de Sergi en el autobús de Madison.</p>
+  </div>
+
+  <div class="progress-area">
+    <div class="progress-info">
+      <span class="progress-label">Tu progreso</span>
+      <span class="progress-count" id="prog-count">0 / 9</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="question-card" id="q1">
+    <div class="q-number">Pregunta 01 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">El capítulo comienza con el experimento del "curso para aprender a caminar". ¿Cuál es el punto que David del Rosario quiere ilustrar con ese ejemplo?</p>
+    <div class="options" id="q1-opts">
+      <button class="option-btn" onclick="answer(1,0,0)"><span class="option-letter">A</span><span class="option-text">Que la educación formal es superior al aprendizaje espontáneo en la mayoría de habilidades humanas.</span></button>
+      <button class="option-btn" onclick="answer(1,1,0)"><span class="option-letter">B</span><span class="option-text">Que asumimos que sabemos hacer algo porque hemos seguido un proceso académico, cuando en realidad ya teníamos esa capacidad antes del proceso.</span></button>
+      <button class="option-btn" onclick="answer(1,2,0)"><span class="option-letter">C</span><span class="option-text">Que caminar es una habilidad que requiere un aprendizaje consciente y estructurado igual que conducir.</span></button>
+      <button class="option-btn" onclick="answer(1,3,0)"><span class="option-letter">D</span><span class="option-text">Que el cuerpo humano necesita instrucción externa para desarrollar sus capacidades motrices básicas.</span></button>
+    </div>
+    <div class="feedback" id="q1-fb">
+      <div class="feedback-title">La trampa del proceso</div>
+      <p>La metáfora critica cómo confundimos el proceso con la causa. Asumimos que sabemos caminar porque hicimos el curso, cuando la capacidad era previa. Del mismo modo, creemos que el tiempo existe porque lo aprendimos —pero podría ser una construcción, no una realidad independiente.</p>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="q2">
+    <div class="q-number">Pregunta 02 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Cómo construye el cerebro la percepción del espacio, según la neurociencia que presenta el capítulo?</p>
+    <div class="options" id="q2-opts">
+      <button class="option-btn" onclick="answer(2,0,1)"><span class="option-letter">A</span><span class="option-text">A través del córtex visual, que recibe y procesa la luz reflejada en los objetos del entorno.</span></button>
+      <button class="option-btn" onclick="answer(2,1,1)"><span class="option-letter">B</span><span class="option-text">Mediante cuatro tipos de neuronas —de ubicación, dirección, límite y velocidad— integradas en el hipocampo, que construyen un mapa mental único para cada entorno.</span></button>
+      <button class="option-btn" onclick="answer(2,2,1)"><span class="option-letter">C</span><span class="option-text">Por medio del sistema vestibular del oído interno, que detecta la posición y el movimiento del cuerpo.</span></button>
+      <button class="option-btn" onclick="answer(2,3,1)"><span class="option-letter">D</span><span class="option-text">A través de la corteza prefrontal, que modela el espacio con base en experiencias acumuladas.</span></button>
+    </div>
+    <div class="feedback" id="q2-fb">
+      <div class="feedback-title">El mapa no es el territorio</div>
+      <p>Las personas no nos desplazamos por el espacio real sino por el mapa mental que construye el hipocampo. Si ese mapa se daña —como ocurre en las primeras fases del alzhéimer— el espacio pierde significado. Nunca habitamos el espacio directamente: habitamos nuestra representación de él.</p>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="q3">
+    <div class="q-number">Pregunta 03 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">Según el capítulo, ¿qué significa que el Big Bang "está ocurriendo ahora" y no solo ocurrió hace 14.000 millones de años?</p>
+    <div class="options" id="q3-opts">
+      <button class="option-btn" onclick="answer(3,0,2)"><span class="option-letter">A</span><span class="option-text">Que la cosmología ha revisado la fecha del Big Bang y ahora se estima que es más reciente de lo que se pensaba.</span></button>
+      <button class="option-btn" onclick="answer(3,1,2)"><span class="option-letter">B</span><span class="option-text">Que los efectos del Big Bang son visibles todavía en la radiación de fondo del universo.</span></button>
+      <button class="option-btn" onclick="answer(3,2,2)"><span class="option-letter">C</span><span class="option-text">Que el universo sigue expandiéndose actualmente —el espacio-tiempo está vivo y en constante creación— y nosotros somos puntos en esa expansión continua.</span></button>
+      <button class="option-btn" onclick="answer(3,3,2)"><span class="option-letter">D</span><span class="option-text">Que los agujeros negros recrean constantemente el Big Bang a pequeña escala en distintos puntos del cosmos.</span></button>
+    </div>
+    <div class="feedback" id="q3-fb">
+      <div class="feedback-title">El espacio está vivo</div>
+      <p>Esta es una de las ideas más provocadoras del capítulo: no vivimos en un universo-objeto estático. El universo se expande ahora mismo. Somos marcas de rotulador en un globo que se sigue inflando. El "ahora" es la nueva cantidad de tiempo que nace con cada instante de esa expansión.</p>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="q4">
+    <div class="q-number">Pregunta 04 <span class="q-type-badge">Comprensión</span></div>
+    <p class="q-text">¿Qué demostró Einstein al asumir el espacio-tiempo como un todo entremezclado?</p>
+    <div class="options" id="q4-opts">
+      <button class="option-btn" onclick="answer(4,0,3)"><span class="option-letter">A</span><span class="option-text">Que la velocidad de la luz es el límite absoluto para todo desplazamiento en el universo.</span></button>
+      <button class="option-btn" onclick="answer(4,1,3)"><span class="option-letter">B</span><span class="option-text">Que la gravedad es una curvatura del espacio producida por la masa de los cuerpos celestes.</span></button>
+      <button class="option-btn" onclick="answer(4,2,3)"><span class="option-letter">C</span><span class="option-text">Que el espacio y el tiempo son dimensiones independientes que nunca pueden interactuar.</span></button>
+      <button class="option-btn" onclick="answer(4,3,3)"><span class="option-letter">D</span><span class="option-text">Que pasado y futuro ocurren simultáneamente, y que espacio y tiempo por separado son una ilusión.</span></button>
+    </div>
+    <div class="feedback" id="q4-fb">
+      <div class="feedback-title">Einstein como aliado del presente</div>
+      <p>El capítulo usa a Einstein no como autoridad científica aislada, sino como confirmación matemática de que el tiempo lineal —pasado → presente → futuro— es una construcción perceptiva. La relatividad muestra que el ayer y el mañana comparten el mismo instante a todos los niveles del cosmos.</p>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="q5">
+    <div class="q-number">Pregunta 05 <span class="q-type-badge">Inferencia</span></div>
+    <p class="q-text">Sergi Torres relata que en el autobús de Madison colapsó tres horas de viaje en un instante, mientras la señora del asiento de delante vivía el trayecto completo. ¿Qué conclusión extrae de esta diferencia?</p>
+    <div class="options" id="q5-opts">
+      <button class="option-btn" onclick="answer(5,0,0)"><span class="option-letter">A</span><span class="option-text">Que el tiempo es subjetivo y nace en la mente humana: dos personas pueden recorrer la misma distancia viviendo duraciones completamente distintas.</span></button>
+      <button class="option-btn" onclick="answer(5,1,0)"><span class="option-letter">B</span><span class="option-text">Que Sergi estaba dormido durante parte del trayecto y su mente confundió el sueño con la experiencia de viaje.</span></button>
+      <button class="option-btn" onclick="answer(5,2,0)"><span class="option-letter">C</span><span class="option-text">Que la concentración meditativa reduce la velocidad del metabolismo y altera la percepción del tiempo.</span></button>
+      <button class="option-btn" onclick="answer(5,3,0)"><span class="option-letter">D</span><span class="option-text">Que el tiempo percibido está directamente relacionado con el número de estímulos sensoriales procesados.</span></button>
+    </div>
+    <div class="feedback" id="q5-fb">
+      <div class="feedback-title">Dos realidades en el mismo autobús</div>
+      <p>La experiencia no es un anécdota: es la demostración personal de que el tiempo depende de la concepción mental. Una persona galáctica viviría esas tres horas como 6,4 nanosegundos. El tiempo no es un hecho externo igual para todos: es una construcción interna.</p>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="q6">
+    <div class="q-number">Pregunta 06 <span class="q-type-badge">Inferencia</span></div>
+    <p class="q-text">El capítulo explica que medir un mismo recorrido con reglas de diferente tamaño da resultados distintos. ¿Qué analogía propone David del Rosario con la conciencia?</p>
+    <div class="options" id="q6-opts">
+      <button class="option-btn" onclick="answer(6,0,1)"><span class="option-letter">A</span><span class="option-text">Que la inteligencia humana varía según el tamaño del cerebro, de modo similar a como la medida varía según la regla.</span></button>
+      <button class="option-btn" onclick="answer(6,1,1)"><span class="option-letter">B</span><span class="option-text">Que la "escala mental de medida" determina cuánto se fragmenta la conciencia: una mentalidad abierta fragmenta poco; una de miras cortas —con más miedos— divide más, generando mayor sensación de separación.</span></button>
+      <button class="option-btn" onclick="answer(6,2,1)"><span class="option-letter">C</span><span class="option-text">Que el IQ es relativo al contexto cultural, igual que la medida es relativa a la escala usada.</span></button>
+      <button class="option-btn" onclick="answer(6,3,1)"><span class="option-letter">D</span><span class="option-text">Que no existe forma de medir la conciencia porque siempre depende del observador, igual que la medida del espacio.</span></button>
+    </div>
+    <div class="feedback" id="q6-fb">
+      <div class="feedback-title">Miedo = más fragmentación</div>
+      <p>Esta es una de las ideas más originales del capítulo: el miedo no solo nos hace sufrir, nos hace percibir más separación. Cuantos más miedos, más divisiones necesita el cerebro para mantener el "yo" separado como algo real. La apertura reduce la escala, y con ella, la distancia entre uno mismo y el todo.</p>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="q7">
+    <div class="q-number">Pregunta 07 <span class="q-type-badge">Análisis</span></div>
+    <p class="q-text">El capítulo propone que "el verdadero presente no se encuentra entre el ayer y el mañana". ¿Qué distinción hace entre el "presente imaginado" y el "presente real"?</p>
+    <div class="options" id="q7-opts">
+      <button class="option-btn" onclick="answer(7,0,2)"><span class="option-letter">A</span><span class="option-text">El presente imaginado es el que viven las personas con tendencia a fantasear; el presente real es el que viven quienes se mantienen en lo concreto y práctico.</span></button>
+      <button class="option-btn" onclick="answer(7,1,2)"><span class="option-letter">B</span><span class="option-text">El presente imaginado es el que percibimos en sueños; el presente real es el que compartimos con otros mediante el lenguaje.</span></button>
+      <button class="option-btn" onclick="answer(7,2,2)"><span class="option-letter">C</span><span class="option-text">El presente imaginado es el punto medio entre pasado y futuro que el cerebro construye neuronalmente; el presente real es el instante que nace con la expansión del universo e incluye todo —pasado, futuro, pensamientos y sensaciones— simultáneamente.</span></button>
+      <button class="option-btn" onclick="answer(7,3,2)"><span class="option-letter">D</span><span class="option-text">El presente imaginado es el que describen los libros de meditación; el presente real es el que viven solo las personas con práctica contemplativa avanzada.</span></button>
+    </div>
+    <div class="feedback" id="q7-fb">
+      <div class="feedback-title">El presente que nos enseñaron y el que existe</div>
+      <p>El presente neuronal —ese "ahora" aprendido como punto entre ayer y mañana— es coherente pero no real. El presente de la física es radicalmente distinto: un instante en constante creación que contiene todo lo que fue y será. "Todo lo que has pensado y pensarás son los efectos de lo que estás pensando ahora."</p>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="q8">
+    <div class="q-number">Pregunta 08 <span class="q-type-badge">Análisis</span></div>
+    <p class="q-text">Sergi Torres describe que abortó la experiencia de "teletransportación" porque su yo histórico "desaparecería por el camino". ¿Qué papel juega el miedo en esa decisión, según el capítulo?</p>
+    <div class="options" id="q8-opts">
+      <button class="option-btn" onclick="answer(8,0,3)"><span class="option-letter">A</span><span class="option-text">El miedo fue una señal de peligro físico real que el cuerpo activó para proteger la integridad corporal.</span></button>
+      <button class="option-btn" onclick="answer(8,1,3)"><span class="option-letter">B</span><span class="option-text">El miedo fue una respuesta irracional que no tenía relación con la experiencia vivida.</span></button>
+      <button class="option-btn" onclick="answer(8,2,3)"><span class="option-letter">C</span><span class="option-text">El miedo fue una respuesta cultural programada que impide experiencias espirituales genuinas.</span></button>
+      <button class="option-btn" onclick="answer(8,3,3)"><span class="option-letter">D</span><span class="option-text">El miedo fue la reacción de la mentalidad superviviente ante la posibilidad de que el "yo conocido" desapareciera: depender de lo conocido a toda costa impidió completar la experiencia.</span></button>
+    </div>
+    <div class="feedback" id="q8-fb">
+      <div class="feedback-title">La mentalidad superviviente detiene lo posible</div>
+      <p>Esta es la conexión directa con el capítulo 1: la biología de la supervivencia no solo nos mantiene en el estrés cotidiano —también detiene la expansión de lo que somos capaces de experimentar. El yo histórico, con su necesidad de continuidad, es el límite. Y ese límite lo pone el miedo.</p>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="q9">
+    <div class="q-number">Pregunta 09 <span class="q-type-badge">Síntesis</span></div>
+    <p class="q-text">El capítulo concluye que "todo lo que has pensado y pensarás son los efectos de lo que estás pensando ahora". ¿Qué implicación práctica tiene esta afirmación para una persona que quiere cambiar algo en su vida?</p>
+    <div class="options" id="q9-opts">
+      <button class="option-btn" onclick="answer(9,0,0)"><span class="option-letter">A</span><span class="option-text">Que el único punto de transformación real es el pensamiento presente: cambiar lo que se piensa ahora no solo afecta el futuro, sino que reorganiza la experiencia de todo lo vivido.</span></button>
+      <button class="option-btn" onclick="answer(9,1,0)"><span class="option-letter">B</span><span class="option-text">Que es inútil intentar cambiar porque los pensamientos pasados ya determinaron el futuro de forma irreversible.</span></button>
+      <button class="option-btn" onclick="answer(9,2,0)"><span class="option-letter">C</span><span class="option-text">Que para cambiar el presente hay que trabajar el pasado a través de técnicas de reprogramación de memorias.</span></button>
+      <button class="option-btn" onclick="answer(9,3,0)"><span class="option-letter">D</span><span class="option-text">Que el pensamiento presente solo afecta al futuro inmediato y no tiene relación con el pasado ya vivido.</span></button>
+    </div>
+    <div class="feedback" id="q9-fb">
+      <div class="feedback-title">El presente como palanca de todo</div>
+      <p>Si pasado y futuro son efectos del pensamiento presente, entonces cambiar el estado mental ahora es la única intervención posible y real. No hay que "sanar el pasado" ni "construir el futuro": hay que habitar el presente con una conciencia distinta. Esa es la propuesta práctica del capítulo.</p>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-panel" id="result-panel">
+    <div class="result-score" id="score-display">0</div>
+    <div class="result-label">de 9 preguntas correctas</div>
+    <p class="result-message" id="result-msg"></p>
+    <div class="result-bars">
+      <div class="result-stat"><div class="result-stat-n" id="r-correct">0</div><div class="result-stat-l">Correctas</div></div>
+      <div class="result-stat"><div class="result-stat-n" id="r-wrong">0</div><div class="result-stat-l">Incorrectas</div></div>
+      <div class="result-stat"><div class="result-stat-n" id="r-pct">0%</div><div class="result-stat-l">Puntuación</div></div>
+    </div>
+    <button class="btn-retry" onclick="resetQuiz()">Volver a intentarlo</button>
+  </div>
+
+</main>
+
+<footer class="quiz-footer">Spring Up · Atelier de Vida · Tercer Espacio &nbsp;·&nbsp; La Biología del Presente · Conversación 3</footer>
+
+<script>
+  const TOTAL = 9;
+  const CORRECT = { 1:1, 2:1, 3:2, 4:3, 5:0, 6:1, 7:2, 8:3, 9:0 };
+  let answered = 0, correct = 0;
+
+  const MSGS = {
+    100: "Alcanzaste la biología del presente en esta conversación. Comprendes que el tiempo y el espacio son construcciones, y que el único instante real es el que estás habitando ahora.",
+    75: "Comprensión sólida del capítulo. Las ideas de Einstein, Feynman y el autobús de Madison han aterrizado bien. Repasa los puntos donde dudaste.",
+    50: "Vas bien encaminado. Este capítulo desafía profundamente el sentido común. Vale la pena releerlo con calma y volver al quiz.",
+    0: "Este capítulo propone ideas que chocan con nuestra forma habitual de percibir. Te invitamos a releerlo y a dejar que las ideas te cuestionen antes de responderlas."
+  };
+
+  function getMessage(pct) {
+    if (pct === 100) return MSGS[100];
+    if (pct >= 75) return MSGS[75];
+    if (pct >= 50) return MSGS[50];
+    return MSGS[0];
+  }
+
+  function answer(qNum, chosen, correctIdx) {
+    const qId = 'q' + qNum;
+    const opts = document.getElementById(qId + '-opts').querySelectorAll('.option-btn');
+    opts.forEach(b => b.disabled = true);
+    const isOk = chosen === correctIdx;
+    opts[chosen].classList.add(isOk ? 'correct' : 'incorrect');
+    if (!isOk) opts[correctIdx].classList.add('missed');
+    const fb = document.getElementById(qId + '-fb');
+    fb.classList.add('show');
+    if (!isOk) fb.classList.add('wrong-fb');
+    document.getElementById(qId).classList.add('answered');
+    answered++;
+    if (isOk) correct++;
+    const pct = Math.round((answered / TOTAL) * 100);
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('prog-count').textContent = answered + ' / ' + TOTAL;
+    if (answered === TOTAL) setTimeout(showResult, 600);
+  }
+
+  function showResult() {
+    const pct = Math.round((correct / TOTAL) * 100);
+    document.getElementById('score-display').textContent = correct;
+    document.getElementById('result-msg').textContent = getMessage(pct);
+    document.getElementById('r-correct').textContent = correct;
+    document.getElementById('r-wrong').textContent = TOTAL - correct;
+    document.getElementById('r-pct').textContent = pct + '%';
+    const panel = document.getElementById('result-panel');
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetQuiz() {
+    answered = 0; correct = 0;
+    document.getElementById('prog-fill').style.width = '0%';
+    document.getElementById('prog-count').textContent = '0 / ' + TOTAL;
+    document.getElementById('result-panel').classList.remove('show');
+    for (let q = 1; q <= TOTAL; q++) {
+      const qId = 'q' + q;
+      document.getElementById(qId).classList.remove('answered');
+      document.getElementById(qId + '-opts').querySelectorAll('.option-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect', 'missed');
+      });
+      const fb = document.getElementById(qId + '-fb');
+      fb.classList.remove('show', 'wrong-fb');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

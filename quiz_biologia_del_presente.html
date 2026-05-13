@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · La Biología del Presente · Spring Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Julius+Sans+One&family=Jost:wght@300;400;500;600&family=Forum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --marron: #514236;
+    --turquesa: #2F5D62;
+    --turquesa-light: #4A6D70;
+    --turquesa-aireado: #608D93;
+    --dorado: #C9A84C;
+    --dorado-light: #E8D5A3;
+    --cream: #F9F5EF;
+    --cream-dark: #EDE6D8;
+    --texto: #2C2C2C;
+    --texto-sec: #514236;
+    --blanco: #FFFFFF;
+    --correct: #2F5D62;
+    --incorrect: #8B3A3A;
+    --correct-bg: #E1F0EF;
+    --incorrect-bg: #F5E8E8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Forum', Georgia, serif;
+    background: var(--cream);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--marron);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .logo-svg {
+    width: 42px;
+    height: 42px;
+  }
+  .brand-name {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--dorado-light);
+    text-transform: uppercase;
+  }
+  .brand-line {
+    width: 1px;
+    height: 32px;
+    background: rgba(201,168,76,0.4);
+  }
+  .brand-sub {
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: rgba(232,213,163,0.7);
+    text-transform: uppercase;
+  }
+
+  .header h1 {
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 1.5rem;
+    color: var(--dorado-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    font-weight: 400;
+  }
+  .header p {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(232,213,163,0.7);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ─── CHAPTER TABS ─── */
+  .tab-bar {
+    display: flex;
+    background: var(--cream-dark);
+    border-bottom: 2px solid var(--dorado-light);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--turquesa-light);
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab-btn.active {
+    background: var(--cream);
+    color: var(--marron);
+    border-bottom: 3px solid var(--marron);
+  }
+  .tab-btn:hover:not(.active) {
+    background: rgba(81,66,54,0.05);
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .chapter-panel { display: none; }
+  .chapter-panel.active { display: block; }
+
+  /* ─── INTRO BOX ─── */
+  .chapter-intro {
+    background: var(--turquesa);
+    color: var(--cream);
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .chapter-intro::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chapter-intro h2 {
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--dorado-light);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.04em;
+  }
+  .chapter-intro p {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(249,245,239,0.85);
+    line-height: 1.6;
+  }
+  .chapter-tag {
+    display: inline-block;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: rgba(201,168,76,0.2);
+    color: var(--dorado-light);
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ─── PROGRESS ─── */
+  .progress-area {
+    margin-bottom: 1.75rem;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .progress-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--turquesa-light);
+  }
+  .progress-count {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--marron);
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--cream-dark);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--turquesa), var(--dorado));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  /* ─── QUESTION CARD ─── */
+  .question-card {
+    background: var(--blanco);
+    border-radius: 16px;
+    border: 1px solid var(--cream-dark);
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 12px rgba(81,66,54,0.06);
+    transition: all 0.3s;
+  }
+  .question-card.answered {
+    border-color: var(--dorado-light);
+  }
+
+  .q-number {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--turquesa-aireado);
+    margin-bottom: 0.75rem;
+  }
+  .q-type-badge {
+    display: inline-block;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    background: var(--cream);
+    color: var(--turquesa);
+    border: 1px solid var(--turquesa-aireado);
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+  }
+
+  .q-text {
+    font-family: 'Forum', Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--texto);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ─── OPTIONS ─── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: var(--cream);
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s;
+    width: 100%;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--turquesa-light);
+    background: rgba(47,93,98,0.05);
+  }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+  }
+  .option-btn.incorrect {
+    background: var(--incorrect-bg);
+    border-color: var(--incorrect);
+  }
+  .option-btn.missed {
+    background: rgba(201,168,76,0.08);
+    border-color: var(--dorado);
+  }
+
+  .option-letter {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--blanco);
+    border: 1.5px solid var(--cream-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--turquesa);
+    transition: all 0.25s;
+  }
+  .option-btn.correct .option-letter {
+    background: var(--correct);
+    border-color: var(--correct);
+    color: white;
+  }
+  .option-btn.incorrect .option-letter {
+    background: var(--incorrect);
+    border-color: var(--incorrect);
+    color: white;
+  }
+  .option-btn.missed .option-letter {
+    background: var(--dorado);
+    border-color: var(--dorado);
+    color: white;
+  }
+
+  .option-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--texto);
+    padding-top: 2px;
+  }
+
+  /* ─── FEEDBACK ─── */
+  .feedback {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    border-left: 3px solid var(--turquesa);
+    background: rgba(47,93,98,0.06);
+  }
+  .feedback.show { display: block; }
+  .feedback-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--turquesa);
+    margin-bottom: 0.4rem;
+  }
+  .feedback p {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.84rem;
+    line-height: 1.6;
+    color: var(--texto-sec);
+  }
+  .feedback.wrong-feedback {
+    border-left-color: var(--dorado);
+    background: rgba(201,168,76,0.08);
+  }
+  .feedback.wrong-feedback .feedback-title { color: var(--marron); }
+
+  /* ─── RESULT PANEL ─── */
+  .result-panel {
+    display: none;
+    background: var(--blanco);
+    border-radius: 16px;
+    border: 1px solid var(--dorado-light);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  .result-panel.show { display: block; }
+
+  .result-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  .result-score {
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 3.5rem;
+    color: var(--turquesa);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .result-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--turquesa-aireado);
+    margin-bottom: 1.5rem;
+  }
+  .result-message {
+    font-family: 'Forum', serif;
+    font-size: 1.05rem;
+    color: var(--texto-sec);
+    line-height: 1.7;
+    max-width: 440px;
+    margin: 0 auto 2rem;
+  }
+  .result-bars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .result-stat {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .result-stat-n {
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 1.8rem;
+    color: var(--marron);
+    font-weight: 400;
+  }
+  .result-stat-l {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--turquesa-aireado);
+  }
+
+  .btn-retry {
+    background: var(--marron);
+    color: var(--dorado-light);
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem 2rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-retry:hover { background: #3d3029; }
+
+  /* ─── DIVIDER ─── */
+  .ornamental-divider {
+    text-align: center;
+    color: var(--dorado);
+    font-size: 1.2rem;
+    letter-spacing: 0.5em;
+    margin: 2rem 0;
+    opacity: 0.5;
+  }
+
+  /* ─── FOOTER ─── */
+  .quiz-footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--turquesa-light);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 1.2rem; }
+    .result-bars { grid-template-columns: repeat(3, 1fr); }
+    .brand-line, .brand-sub { display: none; }
+    .main { padding: 1.5rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo-area">
+    <!-- Spring Up Logo SVG inline (simplified version) -->
+    <svg class="logo-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="12" r="5" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M40 18 C40 18 28 28 28 42 C28 52 34 56 40 56 C46 56 52 52 52 42 C52 28 40 18 40 18Z" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <path d="M40 56 L40 70" stroke="#C9A84C" stroke-width="1.5"/>
+      <path d="M28 42 C22 40 18 44 20 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M52 42 C58 40 62 44 60 50" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="brand-name">Spring Up</div>
+      <div class="brand-sub">Atelier de Vida</div>
+    </div>
+    <div class="brand-line"></div>
+    <div>
+      <div class="brand-sub">Tercer Espacio</div>
+    </div>
+  </div>
+  <h1>La Biología del Presente</h1>
+  <p>Quiz de Comprensión · Conversaciones 1 & 2</p>
+</header>
+
+<!-- TABS -->
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="switchChapter(1)">
+    Conversación 1 · El Gato con Botas
+  </button>
+  <button class="tab-btn" onclick="switchChapter(2)">
+    Conversación 2 · El Melocotón
+  </button>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- ═══ CAPÍTULO 1 ═══ -->
+  <div class="chapter-panel active" id="chapter-1">
+
+    <div class="chapter-intro">
+      <div class="chapter-tag">Conversación 1</div>
+      <h2>El Gato con Botas y la Biología de la Supervivencia</h2>
+      <p>Del miedo a la confianza · LUCA, la amígdala, el cortisol y los dos modos biológicos del ser humano.</p>
+    </div>
+
+    <div class="progress-area" id="prog1-area">
+      <div class="progress-info">
+        <span class="progress-label">Tu progreso</span>
+        <span class="progress-count" id="prog1-count">0 / 8</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog1-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-card" id="c1q1">
+      <div class="q-number">Pregunta 01 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">¿Qué significa el acrónimo LUCA y qué rol cumple en el argumento del capítulo?</p>
+      <div class="options" id="c1q1-opts">
+        <button class="option-btn" onclick="answer('c1',1,0,0)"><span class="option-letter">A</span><span class="option-text">Last Universal Common Ancestor · es la primera forma de vida que dio origen a todos los seres vivos hace 3.600 millones de años.</span></button>
+        <button class="option-btn" onclick="answer('c1',1,1,0)"><span class="option-letter">B</span><span class="option-text">Large Unified Cellular Architecture · describe la estructura básica de la célula eucariota moderna.</span></button>
+        <button class="option-btn" onclick="answer('c1',1,2,0)"><span class="option-letter">C</span><span class="option-text">Living Universal Consciousness Activation · el estado de presencia plena que el libro propone como meta.</span></button>
+        <button class="option-btn" onclick="answer('c1',1,3,0)"><span class="option-letter">D</span><span class="option-text">Last Unified Cortical Ancestor · el área cerebral donde se origina el miedo ancestral.</span></button>
+      </div>
+      <div class="feedback" id="c1q1-fb">
+        <div class="feedback-title">Por qué importa</div>
+        <p>LUCA es el punto de partida biológico del libro: toda nuestra experiencia evolutiva, incluyendo los mecanismos de supervivencia, está codificada desde ese ancestro común. Somos LUCA manifestándose de formas distintas.</p>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" id="c1q2">
+      <div class="q-number">Pregunta 02 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">Según el texto, ¿cuál es la función principal de la amígdala dentro de la biología de la supervivencia?</p>
+      <div class="options" id="c1q2-opts">
+        <button class="option-btn" onclick="answer('c1',2,0,1)"><span class="option-letter">A</span><span class="option-text">Coordinar los sentidos, la memoria y las emociones, disparando la respuesta de lucha-huida ante amenazas percibidas.</span></button>
+        <button class="option-btn" onclick="answer('c1',2,1,1)"><span class="option-letter">B</span><span class="option-text">Regular el sueño y los ritmos circadianos para garantizar la recuperación celular durante la noche.</span></button>
+        <button class="option-btn" onclick="answer('c1',2,2,1)"><span class="option-letter">C</span><span class="option-text">Almacenar recuerdos de largo plazo y recuperarlos cuando la persona los necesita voluntariamente.</span></button>
+        <button class="option-btn" onclick="answer('c1',2,3,1)"><span class="option-letter">D</span><span class="option-text">Producir directamente cortisol y adrenalina en respuesta al estrés agudo.</span></button>
+      </div>
+      <div class="feedback" id="c1q2-fb">
+        <div class="feedback-title">El detalle clave</div>
+        <p>La amígdala tiene pase VIP a la memoria, los sentidos y las emociones, y se conecta con el hipotálamo —que es quien libera las hormonas del estrés—. Es la gran coordinadora de la respuesta de miedo.</p>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" id="c1q3">
+      <div class="q-number">Pregunta 03 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">El capítulo afirma que el 98% del tiempo la biología de la supervivencia se activa por causas que no son amenazas reales. ¿Qué tipo de situaciones la disparan con más frecuencia?</p>
+      <div class="options" id="c1q3-opts">
+        <button class="option-btn" onclick="answer('c1',3,0,2)"><span class="option-letter">A</span><span class="option-text">Peligros físicos reales como ataques de animales o accidentes de tráfico en contextos urbanos.</span></button>
+        <button class="option-btn" onclick="answer('c1',3,1,2)"><span class="option-letter">B</span><span class="option-text">Enfermedades infecciosas que el sistema inmune detecta antes de que la persona sea consciente.</span></button>
+        <button class="option-btn" onclick="answer('c1',3,2,2)"><span class="option-letter">C</span><span class="option-text">Situaciones ambientales, familiares, laborales y sociales que generan indisposición para vivir ciertas experiencias.</span></button>
+        <button class="option-btn" onclick="answer('c1',3,3,2)"><span class="option-letter">D</span><span class="option-text">Estímulos visuales de alta intensidad que el sistema nervioso autónomo no puede filtrar.</span></button>
+      </div>
+      <div class="feedback" id="c1q3-fb">
+        <div class="feedback-title">La paradoja urbana</div>
+        <p>Un urbanita puede enfrentar una amenaza física real dos o tres veces en toda su vida. Sin embargo, concatena entre 8 y 12 "amenazas imaginarias" por día. El miedo es casi siempre un pensamiento, no una realidad.</p>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" id="c1q4">
+      <div class="q-number">Pregunta 04 <span class="q-type-badge">Inferencia</span></div>
+      <p class="q-text">El texto explica que durante la respuesta de lucha-huida el cuerpo redistribuye la energía. ¿Qué procesos quedan "en paños menores" cuando esto ocurre?</p>
+      <div class="options" id="c1q4-opts">
+        <button class="option-btn" onclick="answer('c1',4,0,3)"><span class="option-letter">A</span><span class="option-text">La memoria a corto plazo y la capacidad de atención focalizada en el presente.</span></button>
+        <button class="option-btn" onclick="answer('c1',4,1,3)"><span class="option-letter">B</span><span class="option-text">Los reflejos musculares y la velocidad de conducción nerviosa en las extremidades.</span></button>
+        <button class="option-btn" onclick="answer('c1',4,2,3)"><span class="option-letter">C</span><span class="option-text">La regulación de la temperatura corporal y el equilibrio hormonal de base.</span></button>
+        <button class="option-btn" onclick="answer('c1',4,3,3)"><span class="option-letter">D</span><span class="option-text">La digestión, la reproducción, el crecimiento y el sistema de defensas y regeneración celular (médico interno).</span></button>
+      </div>
+      <div class="feedback" id="c1q4-fb">
+        <div class="feedback-title">El "médico interno" en cola</div>
+        <p>Cuando el cuerpo cree que hay un peligro, prioriza la supervivencia inmediata sobre los procesos de largo plazo. Si ese estado se vuelve crónico, el médico interno —el sistema inmune y regenerador— queda sin energía.</p>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" id="c1q5">
+      <div class="q-number">Pregunta 05 <span class="q-type-badge">Conceptos</span></div>
+      <p class="q-text">¿Qué diferencia establece el capítulo entre la "biología de la supervivencia" y la "biología del presente"?</p>
+      <div class="options" id="c1q5-opts">
+        <button class="option-btn" onclick="answer('c1',5,0,0)"><span class="option-letter">A</span><span class="option-text">La biología de la supervivencia es reactiva, basada en el miedo y el pasado/futuro; la biología del presente es receptiva, basada en la confianza y el aquí-ahora.</span></button>
+        <button class="option-btn" onclick="answer('c1',5,1,0)"><span class="option-letter">B</span><span class="option-text">La biología de la supervivencia es exclusivamente genética; la biología del presente es puramente mental y no tiene base biológica.</span></button>
+        <button class="option-btn" onclick="answer('c1',5,2,0)"><span class="option-letter">C</span><span class="option-text">La biología de la supervivencia opera solo en contextos de peligro físico real; la del presente opera en ambientes seguros.</span></button>
+        <button class="option-btn" onclick="answer('c1',5,3,0)"><span class="option-letter">D</span><span class="option-text">Son dos fases del mismo ciclo biológico que se alternan cada 12 horas de forma natural.</span></button>
+      </div>
+      <div class="feedback" id="c1q5-fb">
+        <div class="feedback-title">La distinción central del libro</div>
+        <p>Esta es la oposición que estructura todo el libro. La biología de la supervivencia escudriña amenazas y nos ancla al pasado y al futuro. La biología del presente opera desde la curiosidad, la apertura y la confianza en el momento actual.</p>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-card" id="c1q6">
+      <div class="q-number">Pregunta 06 <span class="q-type-badge">Análisis</span></div>
+      <p class="q-text">El capítulo usa el experimento del electrodo en el gato para ilustrar un punto. ¿Cuál es la conclusión que los autores extraen de ese experimento?</p>
+      <div class="options" id="c1q6-opts">
+        <button class="option-btn" onclick="answer('c1',6,0,1)"><span class="option-letter">A</span><span class="option-text">Que el sufrimiento animal es equivalente al humano y debería considerarse en la ética de la investigación.</span></button>
+        <button class="option-btn" onclick="answer('c1',6,1,1)"><span class="option-letter">B</span><span class="option-text">Que la respuesta de lucha-huida puede activarse por estimulación directa del lóbulo temporal, mostrando que el miedo tiene un origen neurológico localizable.</span></button>
+        <button class="option-btn" onclick="answer('c1',6,2,1)"><span class="option-letter">C</span><span class="option-text">Que los animales tienen mayor capacidad de supervivencia que los seres humanos por tener instintos más puros.</span></button>
+        <button class="option-btn" onclick="answer('c1',6,3,1)"><span class="option-letter">D</span><span class="option-text">Que la amígdala solo se activa ante estímulos físicos externos, no ante pensamientos internos.</span></button>
+      </div>
+      <div class="feedback" id="c1q6-fb">
+        <div class="feedback-title">La neurociencia del miedo</div>
+        <p>El experimento demuestra que la respuesta de lucha-huida se puede provocar estimulando la amígdala en el lóbulo temporal. Esto sitúa el miedo en el sistema nervioso —y por tanto, sugiere que también los pensamientos que activan esa zona pueden desencadenarlo.</p>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-card" id="c1q7">
+      <div class="q-number">Pregunta 07 <span class="q-type-badge">Inferencia</span></div>
+      <p class="q-text">Sergi Torres propone que "confiar para obtener algo a cambio" no es confianza real. ¿Por qué?</p>
+      <div class="options" id="c1q7-opts">
+        <button class="option-btn" onclick="answer('c1',7,0,2)"><span class="option-letter">A</span><span class="option-text">Porque la confianza solo es auténtica cuando se dirige hacia figuras de autoridad reconocida.</span></button>
+        <button class="option-btn" onclick="answer('c1',7,1,2)"><span class="option-letter">B</span><span class="option-text">Porque la confianza instrumental activa circuitos de recompensa que interfieren con la presencia.</span></button>
+        <button class="option-btn" onclick="answer('c1',7,2,2)"><span class="option-letter">C</span><span class="option-text">Porque confiar con expectativa de resultado es en realidad miedo disfrazado de confianza: el miedo a no obtener lo que se quiere sigue operando en el fondo.</span></button>
+        <button class="option-btn" onclick="answer('c1',7,3,2)"><span class="option-letter">D</span><span class="option-text">Porque la confianza y el miedo son reacciones fisiológicas idénticas que solo se diferencian por la intensidad.</span></button>
+      </div>
+      <div class="feedback" id="c1q7-fb">
+        <div class="feedback-title">El disfraz del miedo</div>
+        <p>El capítulo es claro: "O confías, o tienes miedo. Debes elegir." Cuando la confianza está condicionada a un resultado —curarme, no estar solo, encontrar la verdad— es el miedo a perder ese resultado el que realmente manda.</p>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-card" id="c1q8">
+      <div class="q-number">Pregunta 08 <span class="q-type-badge">Síntesis</span></div>
+      <p class="q-text">¿Cuál es la propuesta práctica que el capítulo deja al lector para salir de la biología de la supervivencia?</p>
+      <div class="options" id="c1q8-opts">
+        <button class="option-btn" onclick="answer('c1',8,0,3)"><span class="option-letter">A</span><span class="option-text">Desarrollar técnicas de respiración y meditación para reducir el cortisol en sangre.</span></button>
+        <button class="option-btn" onclick="answer('c1',8,1,3)"><span class="option-letter">B</span><span class="option-text">Eliminar toda fuente externa de estrés —trabajo, relaciones conflictivas, entornos inseguros—.</span></button>
+        <button class="option-btn" onclick="answer('c1',8,2,3)"><span class="option-letter">C</span><span class="option-text">Usar la razón y el argumento racional para convencerse de que las amenazas no son reales.</span></button>
+        <button class="option-btn" onclick="answer('c1',8,3,3)"><span class="option-letter">D</span><span class="option-text">Investigarse a uno mismo, observar la propia indisposición y aprender a confiar sin negociar con la vida.</span></button>
+      </div>
+      <div class="feedback" id="c1q8-fb">
+        <div class="feedback-title">El camino del investigador del presente</div>
+        <p>La propuesta no es técnica externa sino autopercepción honesta. "Deja de negociar con la vida e investígate." La respuesta a si uno está dispuesto a confiar sin obtener algo a cambio es una sensación, no un argumento racional.</p>
+      </div>
+    </div>
+
+    <!-- Result C1 -->
+    <div class="result-panel" id="result-c1">
+      <div class="result-score" id="score-c1">0</div>
+      <div class="result-label">de 8 preguntas correctas</div>
+      <p class="result-message" id="msg-c1"></p>
+      <div class="result-bars">
+        <div class="result-stat">
+          <div class="result-stat-n" id="r1-correct">0</div>
+          <div class="result-stat-l">Correctas</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-n" id="r1-wrong">0</div>
+          <div class="result-stat-l">Incorrectas</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-n" id="r1-pct">0%</div>
+          <div class="result-stat-l">Puntuación</div>
+        </div>
+      </div>
+      <button class="btn-retry" onclick="resetChapter(1)">Volver a intentarlo</button>
+    </div>
+
+  </div><!-- end chapter-1 -->
+
+  <!-- ═══ CAPÍTULO 2 ═══ -->
+  <div class="chapter-panel" id="chapter-2">
+
+    <div class="chapter-intro">
+      <div class="chapter-tag">Conversación 2</div>
+      <h2>El Melocotón que Quiere ser Manzana</h2>
+      <p>La personalidad y la desaparición de tu universo · sabor, realidad construida, identidad y el experimento mental de las gafas de realidad virtual.</p>
+    </div>
+
+    <div class="progress-area" id="prog2-area">
+      <div class="progress-info">
+        <span class="progress-label">Tu progreso</span>
+        <span class="progress-count" id="prog2-count">0 / 8</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="prog2-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-card" id="c2q1">
+      <div class="q-number">Pregunta 01 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">¿Cuál es la diferencia fundamental que el capítulo establece entre "gusto" y "sabor"?</p>
+      <div class="options" id="c2q1-opts">
+        <button class="option-btn" onclick="answer('c2',1,0,0)"><span class="option-letter">A</span><span class="option-text">El gusto es información sensorial pura (moléculas, genes, receptores); el sabor es una experiencia mental construida con recuerdos, expectativas, olfato, visión y sonido.</span></button>
+        <button class="option-btn" onclick="answer('c2',1,1,0)"><span class="option-letter">B</span><span class="option-text">El gusto es subjetivo y cultural; el sabor es objetivo y universal para todos los seres humanos.</span></button>
+        <button class="option-btn" onclick="answer('c2',1,2,0)"><span class="option-letter">C</span><span class="option-text">El gusto depende del entrenamiento sensorial; el sabor es innato y no puede modificarse.</span></button>
+        <button class="option-btn" onclick="answer('c2',1,3,0)"><span class="option-letter">D</span><span class="option-text">No hay diferencia real: gusto y sabor son términos intercambiables que describen lo mismo.</span></button>
+      </div>
+      <div class="feedback" id="c2q1-fb">
+        <div class="feedback-title">La construcción del sabor</div>
+        <p>Esta distinción es la clave del capítulo: lo que creemos experimentar directamente (el sabor) es en realidad una construcción cerebral. El dato sensorial puro (gusto) llega, y el cerebro lo interpreta añadiendo recuerdos, expectativas y contexto.</p>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" id="c2q2">
+      <div class="q-number">Pregunta 02 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">En el experimento mental de las gafas de realidad virtual, ¿qué paradoja se busca revelar?</p>
+      <div class="options" id="c2q2-opts">
+        <button class="option-btn" onclick="answer('c2',2,0,1)"><span class="option-letter">A</span><span class="option-text">Que la tecnología de realidad virtual puede reemplazar completamente la experiencia física real.</span></button>
+        <button class="option-btn" onclick="answer('c2',2,1,1)"><span class="option-letter">B</span><span class="option-text">Que el cerebro puede experimentar "manzana" mientras el cuerpo muerde un melocotón, evidenciando que la experiencia vivida no es el objeto real sino la interpretación mental.</span></button>
+        <button class="option-btn" onclick="answer('c2',2,2,1)"><span class="option-letter">C</span><span class="option-text">Que los sentidos son más fiables que los recuerdos cuando se trata de identificar alimentos.</span></button>
+        <button class="option-btn" onclick="answer('c2',2,3,1)"><span class="option-letter">D</span><span class="option-text">Que la realidad virtual puede usarse terapéuticamente para modificar preferencias alimentarias.</span></button>
+      </div>
+      <div class="feedback" id="c2q2-fb">
+        <div class="feedback-title">Melocotón ≠ manzana... ¿o sí?</div>
+        <p>La gracia del experimento es mostrar que "lo que comemos" no es el objeto físico, sino la experiencia que el cerebro construye sobre él. Si esa experiencia puede engañarse con información visual falsa, ¿qué tan directa es nuestra relación con la realidad?</p>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" id="c2q3">
+      <div class="q-number">Pregunta 03 <span class="q-type-badge">Comprensión</span></div>
+      <p class="q-text">El texto afirma que incluso cuando tomamos vino por primera vez —sin recuerdos de vino—, usamos recuerdos de otras bebidas para construir la experiencia. ¿Qué conclusión extrae Sergi Torres de esto?</p>
+      <div class="options" id="c2q3-opts">
+        <button class="option-btn" onclick="answer('c2',3,0,2)"><span class="option-letter">A</span><span class="option-text">Que el gusto se educa con la repetición y mejora con la experiencia acumulada.</span></button>
+        <button class="option-btn" onclick="answer('c2',3,1,2)"><span class="option-letter">B</span><span class="option-text">Que las primeras experiencias de cualquier alimento son siempre las más auténticas.</span></button>
+        <button class="option-btn" onclick="answer('c2',3,2,2)"><span class="option-letter">C</span><span class="option-text">Que nuestra experiencia del presente siempre es un producto de recuerdos: "fabricamos la realidad presente echando mano de la bolsa de nuestros recuerdos".</span></button>
+        <button class="option-btn" onclick="answer('c2',3,3,2)"><span class="option-letter">D</span><span class="option-text">Que los humanos tienen una capacidad innata de comparar sabores sin necesidad de experiencia previa.</span></button>
+      </div>
+      <div class="feedback" id="c2q3-fb">
+        <div class="feedback-title">El archivo de recuerdos como filtro</div>
+        <p>Incluso sin recuerdos específicos de ese objeto, el cerebro usa el archivo disponible para construir una experiencia comparada ("más dulce que", "menos ácido que"). Nunca accedemos al presente desnudo de memoria.</p>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" id="c2q4">
+      <div class="q-number">Pregunta 04 <span class="q-type-badge">Conceptos</span></div>
+      <p class="q-text">¿Cómo define el capítulo la "personalidad"? ¿Cuál es su función dentro de la biología de la supervivencia?</p>
+      <div class="options" id="c2q4-opts">
+        <button class="option-btn" onclick="answer('c2',4,0,3)"><span class="option-letter">A</span><span class="option-text">La personalidad es una expresión auténtica del alma que refleja la esencia inmutable de cada persona.</span></button>
+        <button class="option-btn" onclick="answer('c2',4,1,3)"><span class="option-letter">B</span><span class="option-text">La personalidad es el conjunto de talentos y aptitudes que determinan el éxito en la vida social y profesional.</span></button>
+        <button class="option-btn" onclick="answer('c2',4,2,3)"><span class="option-letter">C</span><span class="option-text">La personalidad es el resultado de la genética y el entorno; es fija a partir de los primeros años de vida.</span></button>
+        <button class="option-btn" onclick="answer('c2',4,3,3)"><span class="option-letter">D</span><span class="option-text">La personalidad es un "motivo fabricado artificialmente con tecnología mental para no desaparecer": un mecanismo de supervivencia que crea un yo estable y continuo que el cerebro pueda proteger.</span></button>
+      </div>
+      <div class="feedback" id="c2q4-fb">
+        <div class="feedback-title">La personalidad como armadura</div>
+        <p>Esta es la afirmación más perturbadora del capítulo. La personalidad no es quiénes somos en esencia, sino la estrategia que usa la biología de supervivencia para mantener la coherencia de un "yo" que proteger. El problema es cuando la confundimos con nuestra identidad profunda.</p>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" id="c2q5">
+      <div class="q-number">Pregunta 05 <span class="q-type-badge">Inferencia</span></div>
+      <p class="q-text">El capítulo plantea que "no nos gustan las cosas: pensamos que nos gustan". ¿Cuál es la consecuencia más importante de esta distinción para la vida cotidiana?</p>
+      <div class="options" id="c2q5-opts">
+        <button class="option-btn" onclick="answer('c2',5,0,0)"><span class="option-letter">A</span><span class="option-text">Que lo que dirige nuestras decisiones, rechazos y preferencias no es la experiencia real sino el pensamiento sobre la experiencia —un archivo que puede estar desactualizado—.</span></button>
+        <button class="option-btn" onclick="answer('c2',5,1,0)"><span class="option-letter">B</span><span class="option-text">Que podemos entrenar el cerebro para que nos gusten todas las cosas si las repetimos suficiente número de veces.</span></button>
+        <button class="option-btn" onclick="answer('c2',5,2,0)"><span class="option-letter">C</span><span class="option-text">Que los gustos son puramente culturales y no tienen ninguna base biológica.</span></button>
+        <button class="option-btn" onclick="answer('c2',5,3,0)"><span class="option-letter">D</span><span class="option-text">Que la preferencia consciente siempre es más confiable que la reacción emocional automática.</span></button>
+      </div>
+      <div class="feedback" id="c2q5-fb">
+        <div class="feedback-title">El archivo que toma decisiones</div>
+        <p>Si gran parte de mis decisiones está basada en pensamientos sobre experiencias pasadas —no en el presente—, entonces vivo mayoritariamente desde un archivo. Esta es la puerta de entrada a preguntarse: ¿estoy eligiendo desde el presente o desde el pasado?</p>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-card" id="c2q6">
+      <div class="q-number">Pregunta 06 <span class="q-type-badge">Análisis</span></div>
+      <p class="q-text">El capítulo menciona que una simple creencia como "este vino es caro" puede alterar el sabor percibido. ¿Qué implica esto sobre la relación entre creencias y experiencia?</p>
+      <div class="options" id="c2q6-opts">
+        <button class="option-btn" onclick="answer('c2',6,0,1)"><span class="option-letter">A</span><span class="option-text">Que el marketing engaña al consumidor de forma antiética y debería regularse más estrictamente.</span></button>
+        <button class="option-btn" onclick="answer('c2',6,1,1)"><span class="option-letter">B</span><span class="option-text">Que las creencias no son solo ideas abstractas: modifican activamente las redes neuronales que procesan la experiencia sensorial, cambiando lo que literalmente se experimenta.</span></button>
+        <button class="option-btn" onclick="answer('c2',6,2,1)"><span class="option-letter">C</span><span class="option-text">Que las personas de mayor poder adquisitivo tienen una experiencia sensorial genuinamente superior.</span></button>
+        <button class="option-btn" onclick="answer('c2',6,3,1)"><span class="option-letter">D</span><span class="option-text">Que el sabor es completamente subjetivo y no hay ningún componente objetivo en la percepción sensorial.</span></button>
+      </div>
+      <div class="feedback" id="c2q6-fb">
+        <div class="feedback-title">Creencia → experiencia real</div>
+        <p>Este punto conecta directamente con el argumento mayor del libro: las creencias no son opiniones flotantes, son configuradoras de la experiencia biológica. El cerebro no distingue entre "la creencia de que esto vale más" y el dato sensorial. Ambos moldean lo que se vive.</p>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-card" id="c2q7">
+      <div class="q-number">Pregunta 07 <span class="q-type-badge">Síntesis</span></div>
+      <p class="q-text">Sergi Torres describe una experiencia de presencia como ocurriendo "en un campo de conciencia fuera del espacio y el tiempo". ¿Cómo se relaciona esto con el concepto de personalidad que el capítulo construye?</p>
+      <div class="options" id="c2q7-opts">
+        <button class="option-btn" onclick="answer('c2',7,0,2)"><span class="option-letter">A</span><span class="option-text">No se relacionan: son dos dimensiones separadas que el libro trata en capítulos distintos sin conexión.</span></button>
+        <button class="option-btn" onclick="answer('c2',7,1,2)"><span class="option-letter">B</span><span class="option-text">La personalidad es necesaria para acceder a estados de presencia porque nos da un punto de referencia estable.</span></button>
+        <button class="option-btn" onclick="answer('c2',7,2,2)"><span class="option-letter">C</span><span class="option-text">La presencia es precisamente el estado donde la personalidad deja de interferir: el yo construido se disuelve y la conciencia accede a un campo más amplio que trasciende la historia personal.</span></button>
+        <button class="option-btn" onclick="answer('c2',7,3,2)"><span class="option-letter">D</span><span class="option-text">La presencia requiere fortalecer la personalidad hasta que sea tan sólida que no necesite defensa.</span></button>
+      </div>
+      <div class="feedback" id="c2q7-fb">
+        <div class="feedback-title">Punta de iceberg y el mar</div>
+        <p>La metáfora del iceberg lo dice todo: somos puntas que creen estar aisladas, pero compartimos como base el mar. Cuando la personalidad deja de ser el centro, la conciencia individual se reconoce como parte de algo más vasto. Eso es presencia.</p>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-card" id="c2q8">
+      <div class="q-number">Pregunta 08 <span class="q-type-badge">Aplicación</span></div>
+      <p class="q-text">Aplicando la lógica del capítulo 2: si alguien dice "Yo soy así, siempre he sido introvertido y no puedo cambiar", ¿qué respondería el libro?</p>
+      <div class="options" id="c2q8-opts">
+        <button class="option-btn" onclick="answer('c2',8,0,3)"><span class="option-letter">A</span><span class="option-text">Que tiene razón: la introversión es un rasgo de personalidad genéticamente determinado que define quién es.</span></button>
+        <button class="option-btn" onclick="answer('c2',8,1,3)"><span class="option-letter">B</span><span class="option-text">Que puede cambiar si trabaja con un terapeuta que lo ayude a reprogramar sus patrones de conducta.</span></button>
+        <button class="option-btn" onclick="answer('c2',8,2,3)"><span class="option-letter">C</span><span class="option-text">Que la introversión es un pensamiento, no un hecho. Del mismo modo que "no me gusta X" es un archivo, "soy introvertido" es una creencia que dirige la conducta pero no define la naturaleza esencial.</span></button>
+        <button class="option-btn" onclick="answer('c2',8,3,3)"><span class="option-letter">D</span><span class="option-text">Que la personalidad introvertida es un mecanismo de supervivencia válido que debe respetarse sin cuestionarse.</span></button>
+      </div>
+      <div class="feedback" id="c2q8-fb">
+        <div class="feedback-title">Pensamiento ≠ identidad esencial</div>
+        <p>El capítulo nos invita exactamente a ese cuestionamiento: "Hay algún rasgo de tu personalidad que defiendes con fuerza pero que en el fondo no estés seguro de haber elegido." La personalidad que protegemos puede ser un archivo, no nuestra naturaleza real.</p>
+      </div>
+    </div>
+
+    <!-- Result C2 -->
+    <div class="result-panel" id="result-c2">
+      <div class="result-score" id="score-c2">0</div>
+      <div class="result-label">de 8 preguntas correctas</div>
+      <p class="result-message" id="msg-c2"></p>
+      <div class="result-bars">
+        <div class="result-stat">
+          <div class="result-stat-n" id="r2-correct">0</div>
+          <div class="result-stat-l">Correctas</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-n" id="r2-wrong">0</div>
+          <div class="result-stat-l">Incorrectas</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-n" id="r2-pct">0%</div>
+          <div class="result-stat-l">Puntuación</div>
+        </div>
+      </div>
+      <button class="btn-retry" onclick="resetChapter(2)">Volver a intentarlo</button>
+    </div>
+
+  </div><!-- end chapter-2 -->
+
+</main>
+
+<footer class="quiz-footer">
+  Spring Up · Atelier de Vida · Tercer Espacio &nbsp;·&nbsp; La Biología del Presente
+</footer>
+
+<script>
+  const state = {
+    c1: { answered: 0, correct: 0, total: 8 },
+    c2: { answered: 0, correct: 0, total: 8 }
+  };
+
+  const correctAnswers = {
+    c1: { 1:0, 2:0, 3:2, 4:3, 5:0, 6:1, 7:2, 8:3 },
+    c2: { 1:0, 2:1, 3:2, 4:3, 5:0, 6:1, 7:2, 8:2 }
+  };
+
+  const messages = {
+    perfect: "Alcanzaste la Biología del Presente en este quiz. Tu comprensión es profunda y precisa. Estás listo para la conversación.",
+    great: "Muy buen trabajo. Tienes una comprensión sólida del capítulo. Repasa las preguntas donde dudaste para consolidar.",
+    good: "Vas bien encaminado. Hay algunas ideas que vale la pena volver a leer con calma. El libro tiene capas.",
+    keep: "Este capítulo tiene densidad conceptual. Te invitamos a releer con lápiz en mano y volver al quiz cuando quieras."
+  };
+
+  function getMessage(pct) {
+    if (pct === 100) return messages.perfect;
+    if (pct >= 75) return messages.great;
+    if (pct >= 50) return messages.good;
+    return messages.keep;
+  }
+
+  function answer(chapter, qNum, chosenIdx, correctIdx) {
+    const chapter_key = chapter;
+    const questionId = chapter + 'q' + qNum;
+    const optsId = questionId + '-opts';
+    const fbId = questionId + '-fb';
+    const cardId = questionId;
+
+    const opts = document.getElementById(optsId).querySelectorAll('.option-btn');
+    opts.forEach(b => b.disabled = true);
+
+    const isCorrect = chosenIdx === correctIdx;
+    opts[chosenIdx].classList.add(isCorrect ? 'correct' : 'incorrect');
+    if (!isCorrect) {
+      opts[correctIdx].classList.add('missed');
+    }
+
+    const fb = document.getElementById(fbId);
+    fb.classList.add('show');
+    if (!isCorrect) fb.classList.add('wrong-feedback');
+
+    document.getElementById(cardId).classList.add('answered');
+
+    state[chapter_key].answered++;
+    if (isCorrect) state[chapter_key].correct++;
+
+    updateProgress(chapter_key);
+
+    if (state[chapter_key].answered === state[chapter_key].total) {
+      setTimeout(() => showResult(chapter_key), 600);
+    }
+  }
+
+  function updateProgress(ch) {
+    const s = state[ch];
+    const pct = Math.round((s.answered / s.total) * 100);
+    document.getElementById('prog' + ch.slice(-1) + '-fill').style.width = pct + '%';
+    document.getElementById('prog' + ch.slice(-1) + '-count').textContent = s.answered + ' / ' + s.total;
+  }
+
+  function showResult(ch) {
+    const s = state[ch];
+    const pct = Math.round((s.correct / s.total) * 100);
+    const n = ch.slice(-1);
+    const panel = document.getElementById('result-' + ch);
+
+    document.getElementById('score-' + ch).textContent = s.correct;
+    document.getElementById('msg-' + ch).textContent = getMessage(pct);
+    document.getElementById('r' + n + '-correct').textContent = s.correct;
+    document.getElementById('r' + n + '-wrong').textContent = s.total - s.correct;
+    document.getElementById('r' + n + '-pct').textContent = pct + '%';
+
+    panel.classList.add('show');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function switchChapter(n) {
+    document.querySelectorAll('.chapter-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('chapter-' + n).classList.add('active');
+    document.querySelectorAll('.tab-btn')[n - 1].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetChapter(n) {
+    const ch = 'c' + n;
+    state[ch] = { answered: 0, correct: 0, total: 8 };
+    updateProgress(ch);
+    document.getElementById('result-' + ch).classList.remove('show');
+
+    for (let q = 1; q <= 8; q++) {
+      const questionId = ch + 'q' + q;
+      const card = document.getElementById(questionId);
+      card.classList.remove('answered');
+      const opts = document.getElementById(questionId + '-opts').querySelectorAll('.option-btn');
+      opts.forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect', 'missed');
+      });
+      const fb = document.getElementById(questionId + '-fb');
+      fb.classList.remove('show', 'wrong-feedback');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
