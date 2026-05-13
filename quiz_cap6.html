@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 6 · La Biología del Presente</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#F5F2EC;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+  .card{background:#fff;border-radius:16px;max-width:680px;width:100%;padding:2rem;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+  .tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.6px;padding:4px 12px;border-radius:20px;background:#F0E8F5;color:#5A2D8A;margin-bottom:.75rem;text-transform:uppercase}
+  .title{font-size:1.15rem;font-weight:700;color:#1A2E28;margin-bottom:.25rem}
+  .subtitle{font-size:13px;color:#7A8A80}
+  .progress-wrap{margin:1.25rem 0}
+  .progress-bar{height:4px;background:#E5E2DC;border-radius:4px;overflow:hidden}
+  .progress-fill{height:100%;background:#5A2D8A;border-radius:4px;transition:width .4s ease}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12px;color:#9A9A90;margin-top:.4rem}
+  .qtype{font-size:10px;letter-spacing:.5px;color:#9A9A90;text-transform:uppercase;margin-bottom:.4rem}
+  .stem{font-size:15px;line-height:1.7;color:#1A2E28;margin-bottom:1.25rem;font-weight:500}
+  .options{display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+  .opt{display:flex;align-items:flex-start;gap:.75rem;padding:.8rem 1rem;border-radius:10px;border:1.5px solid #E0DDD6;cursor:pointer;transition:all .2s;background:#FAFAF8}
+  .opt:hover{border-color:#5A2D8A;background:#F5F0FA}
+  .opt.selected{border-color:#5A2D8A;background:#F0E8F5}
+  .opt.correct{border-color:#2C7A3C;background:#E6F4EC}
+  .opt.wrong{border-color:#A32D2D;background:#FAEAEA}
+  .opt.show-correct{border-color:#2C7A3C;background:#E6F4EC}
+  .letter{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid #C0BDB6;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#6A6A60}
+  .opt.selected .letter{border-color:#5A2D8A;color:#5A2D8A;background:#fff}
+  .opt.correct .letter{border-color:#2C7A3C;color:#2C7A3C;background:#fff}
+  .opt.wrong .letter{border-color:#A32D2D;color:#A32D2D;background:#fff}
+  .opt.show-correct .letter{border-color:#2C7A3C;color:#2C7A3C;background:#fff}
+  .opt-text{font-size:13.5px;line-height:1.55;color:#2A2A22;padding-top:2px}
+  .explain{border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.25rem;font-size:13px;line-height:1.6;display:none}
+  .explain.correct{background:#E6F4EC;border-left:3px solid #2C7A3C;color:#1A4A28}
+  .explain.wrong{background:#FAEAEA;border-left:3px solid #A32D2D;color:#5A1A1A}
+  .explain strong{font-weight:600}
+  .btn{padding:.75rem 1.5rem;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;width:100%}
+  .btn-check{background:#5A2D8A;color:#fff}
+  .btn-check:hover{background:#4A1D7A}
+  .btn-check:disabled{background:#C0BDB6;cursor:not-allowed}
+  .btn-next{background:#5A2D8A;color:#fff;margin-top:.6rem}
+  .btn-next:hover{background:#4A1D7A}
+  .results{text-align:center}
+  .score-big{font-size:3.5rem;font-weight:800;color:#5A2D8A;line-height:1}
+  .score-label{font-size:14px;color:#7A8A80;margin-top:.25rem;margin-bottom:1rem}
+  .perf{font-size:1rem;font-weight:700;color:#1A2E28;margin-bottom:.25rem}
+  .perf-sub{font-size:13px;color:#6A7A70;margin-bottom:1.5rem;line-height:1.5}
+  .divider{height:1px;background:#E5E2DC;margin:1.25rem 0}
+  .detail-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;font-size:13px;color:#4A5A50}
+  .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+  .btn-restart{background:#F0E8F5;color:#5A2D8A;margin-top:.75rem}
+  .btn-restart:hover{background:#E0D0F0}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="tag">Conversación 6</div>
+  <div class="title">La Biología del Presente</div>
+  <div class="subtitle">El cuerpo · Imagen corporal · Enfermedad como mensaje · 10 preguntas</div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+    <div class="progress-meta"><span id="qnum">Pregunta 1 de 10</span><span id="scoreshow">0 correctas</span></div>
+  </div>
+  <div id="root"></div>
+</div>
+<script>
+const Q=[
+  {
+    tipo:"Comprensión directa",
+    stem:"Según el capítulo 6, ¿qué representa el cuerpo en el marco de la biología del presente?",
+    opts:["Un obstáculo que la mente debe aprender a ignorar para alcanzar estados elevados de conciencia","Un instrumento neutro que ejecuta las instrucciones que le da la voluntad consciente","La expresión más honesta e inmediata del estado interno: el cuerpo no miente sobre lo que ocurre en el organismo","Una máquina biológica cuyo funcionamiento es independiente de los estados emocionales","El resultado acumulado de la herencia genética, sin relación con la experiencia vivida"],
+    ans:2,
+    explain:"<strong>C es correcta.</strong> El capítulo establece que el cuerpo es el espejo más fiel del estado interno — no puede fingir ni esconder lo que ocurre en el organismo. A y D son posiciones que el texto rechaza explícitamente. B reduce el cuerpo a un ejecutor pasivo, lo cual contradice la idea de que el cuerpo habla. E corresponde a una visión genética determinista que el libro cuestiona desde el capítulo 1."
+  },
+  {
+    tipo:"Inferencia",
+    stem:"El capítulo usa la metáfora de 'Dolly' para ilustrar la relación entre imagen corporal e identidad. ¿Qué implica esta metáfora sobre la forma en que la mentalidad superviviente se relaciona con el cuerpo?",
+    opts:["Que la persona proyecta en el cuerpo una imagen ideal que luego intenta mantener a cualquier costo","Que el cuerpo es tratado como un objeto externo que debe ser controlado, corregido o mejorado para ser aceptable","Que la insatisfacción corporal es un fenómeno exclusivamente cultural, producido por los medios de comunicación","Que el amor propio es una condición previa necesaria para poder cuidar el cuerpo adecuadamente","Que la imagen corporal negativa es una forma de autocastigo que surge de experiencias de rechazo en la infancia"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> La metáfora de Dolly ilustra cómo la mentalidad superviviente convierte el cuerpo en un objeto externo a juzgar, corregir y controlar — en lugar de habitarlo desde adentro. A describe una consecuencia posible pero no la esencia de la metáfora. C localiza el problema en lo cultural, reduciendo el argumento. D y E introducen marcos terapéuticos que el capítulo no utiliza."
+  },
+  {
+    tipo:"Razonamiento crítico",
+    stem:"El capítulo sostiene que los síntomas físicos son mensajes del organismo, no enemigos a eliminar. ¿Cuál de las siguientes afirmaciones, si fuera verdadera, debilitaría más directamente este argumento?",
+    opts:["La mayoría de los síntomas físicos remiten espontáneamente sin intervención médica","Los síntomas físicos pueden aparecer en organismos completamente sanos como respuesta a estímulos externos","Estudios de psiconeuroinmunología muestran que los estados emocionales afectan directamente el sistema inmune","Algunos síntomas físicos son causados por agentes externos — virus, bacterias, toxinas — sin relación con el estado interno del organismo","La medicina tradicional china también interpreta los síntomas como señales del desequilibrio interno"],
+    ans:3,
+    explain:"<strong>D es la que más debilita.</strong> Si algunos síntomas tienen causas puramente externas (infecciones, toxinas), entonces no todos pueden interpretarse como mensajes del estado interno — la tesis del capítulo necesitaría al menos matizarse. A en realidad es compatible con la tesis. B habla de organismos sanos, no contradice el argumento. C lo refuerza. E también lo apoya desde otra tradición."
+  },
+  {
+    tipo:"Distinción conceptual",
+    stem:"El capítulo distingue entre 'habitar el cuerpo' y 'tener un cuerpo'. ¿Cuál de las siguientes opciones captura mejor esa distinción?",
+    opts:["'Tener un cuerpo' implica cuidarlo con hábitos saludables; 'habitarlo' implica aceptar sus limitaciones","'Tener un cuerpo' es la relación del yo separado con el cuerpo como objeto; 'habitarlo' es la experiencia de presencia desde adentro, sin distancia entre observador y organismo","'Habitar el cuerpo' significa prestarle atención consciente mediante técnicas como el body scan o el mindfulness","'Tener un cuerpo' es una postura filosófica dualista; 'habitarlo' es la postura monista que la neurociencia defiende","La distinción es meramente semántica: ambas expresiones describen la misma relación con el organismo"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> La distinción del capítulo es entre relacionarse con el cuerpo como un objeto externo que se posee y controla (yo separado), versus vivirlo desde adentro como parte de la experiencia presente sin distancia. A habla de hábitos y aceptación, que son conductas, no la distinción ontológica que plantea el texto. C reduce la idea a una técnica. D introduce un debate filosófico que el texto no plantea en esos términos. E niega la distinción."
+  },
+  {
+    tipo:"Inferencia",
+    stem:"El capítulo afirma que rechazar un síntoma físico — querer que desaparezca cuanto antes — puede intensificarlo o perpetuarlo. ¿Qué principio más general del libro sostiene esta afirmación?",
+    opts:["Que la mente tiene el poder de crear enfermedades a través del pensamiento negativo","Que el rechazo de lo que ocurre activa la biología de la supervivencia, que es incompatible con la sanación","Que la aceptación pasiva de los síntomas es siempre la respuesta más adecuada ante la enfermedad","Que el dolor crónico es invariablemente el resultado de un trauma emocional no resuelto","Que el sistema nervioso autónomo regula los síntomas de forma independiente a la voluntad consciente"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> Es la aplicación directa del principio central del libro: el rechazo activa la supervivencia, que cierra el acceso al médico interno. Acoger el síntoma — no resignarse, sino no rechazarlo — es lo que permite que el organismo haga su trabajo. A cae en el cliché del pensamiento positivo. C confunde acoger con resignación pasiva. D y E introducen marcos que el texto no utiliza."
+  },
+  {
+    tipo:"Aplicación",
+    stem:"Una mujer lleva años sintiéndose incómoda con su imagen en el espejo. Cada mañana se examina con severidad y su estado de ánimo depende de lo que ve. Aplicando el marco del capítulo 6, ¿cuál sería la lectura más coherente?",
+    opts:["La mujer necesita trabajar su autoestima con apoyo psicológico para desarrollar una imagen corporal más positiva","La mujer está relacionándose con su cuerpo desde el yo separado: lo trata como un objeto externo que juzga en lugar de habitarlo desde adentro","La solución está en cambiar los hábitos de alimentación y ejercicio para que la imagen que ve mejore objetivamente","La mujer proyecta en el cuerpo insatisfacciones de otras áreas de su vida que no ha sabido resolver","El problema es de origen cultural: los estándares de belleza impuestos por la sociedad generan esta insatisfacción inevitable"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> El capítulo 6 diría que el problema no es la imagen en sí sino la relación con ella: el cuerpo convertido en objeto de juicio externo, mirado desde fuera en lugar de habitado desde dentro. A propone una solución terapéutica válida pero ajena al marco del libro. C propone cambios conductuales externos. D y E son lecturas psicológica y sociológica respectivamente, no el argumento del capítulo."
+  },
+  {
+    tipo:"Análisis de argumento",
+    stem:"El capítulo propone que la enfermedad puede ser una oportunidad. ¿Qué distinción es esencial para que esta afirmación no sea malinterpretada como una justificación del sufrimiento?",
+    opts:["Que 'oportunidad' se refiere a la posibilidad de recibir cuidado y atención de los demás","Que la oportunidad no implica que la persona haya 'buscado' la enfermedad ni que sea su culpa — la responsabilidad no es culpa","Que solo algunas enfermedades son oportunidades; las de origen genético no lo son","Que la oportunidad existe únicamente si la persona tiene una práctica espiritual o contemplativa activa","Que 'oportunidad' significa que la enfermedad puede usarse para manipular el entorno social en beneficio propio"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> El capítulo distingue explícitamente entre culpa (que mira al pasado y paraliza) y responsabilidad (que actúa en el presente). Decir que la enfermedad es una oportunidad no implica que el enfermo la haya causado voluntariamente ni que sea su culpa. A reduce la oportunidad a beneficio social. C introduce una distinción que el texto no hace. D restringe el argumento a un perfil espiritual. E invierte el sentido por completo."
+  },
+  {
+    tipo:"Síntesis entre capítulos",
+    stem:"¿En qué sentido el argumento del capítulo 6 sobre el cuerpo extiende o profundiza el argumento del capítulo 1 sobre la enfermedad?",
+    opts:["El capítulo 6 reemplaza la explicación epigenética del capítulo 1 por una explicación puramente psicosomática","El capítulo 6 añade que no solo la forma de vivir las situaciones afecta la salud, sino también la forma de relacionarse con el propio cuerpo — el cuerpo como territorio de la presencia o de la supervivencia","El capítulo 6 contradice al capítulo 1 al afirmar que el cuerpo tiene una sabiduría propia independiente del estado interno","El capítulo 6 aplica el marco del capítulo 1 exclusivamente a enfermedades crónicas, excluyendo los síntomas agudos","Los dos capítulos son independientes: el 1 habla de situaciones externas y el 6 de la imagen interna, sin conexión conceptual"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> El capítulo 1 establece que el modo de vivir las situaciones afecta la biología. El capítulo 6 profundiza eso al mostrar que el cuerpo mismo puede ser vivido como situación: rechazarlo o juzgarlo activa la supervivencia del mismo modo que rechazar cualquier otra experiencia. A, C, D y E introducen distinciones o contradicciones que los textos no plantean."
+  },
+  {
+    tipo:"Inferencia filosófica",
+    stem:"El capítulo sugiere que el cuerpo 'sabe' cosas que la mente consciente no sabe. ¿Qué concepción del conocimiento subyace a esta afirmación?",
+    opts:["Que el conocimiento intuitivo es superior al conocimiento racional en todas las circunstancias","Que existe un tipo de inteligencia orgánica — no verbal, no conceptual — que opera al margen de la narrativa del yo","Que el inconsciente freudiano almacena memorias corporales que determinan el comportamiento","Que el cuerpo es el único acceso fiable a la realidad, mientras que la mente siempre distorsiona","Que el conocimiento corporal es válido únicamente en el contexto de la práctica meditativa"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> El capítulo apunta a una inteligencia orgánica — la del médico interno, la de LUCA — que no opera a través de conceptos ni narrativa, sino a través de procesos biológicos que la mente superviviente suele interrumpir. A establece una jerarquía que el texto no plantea. C introduce el marco psicoanalítico. D es un empirismo radical ajeno al argumento. E restringe el acceso a un contexto que el libro no requiere."
+  },
+  {
+    tipo:"Síntesis y evaluación crítica",
+    stem:"Integra los argumentos de los capítulos 1, 5 y 6: ¿qué proposición común los articula a los tres?",
+    opts:["Que la mente tiene el poder de sanar el cuerpo si se entrena adecuadamente","Que el modo de relacionarse con la experiencia — sea una situación, una relación o el propio cuerpo — determina si se activa la biología de la supervivencia o la del presente","Que la conciencia es más fundamental que la materia y por eso puede modificar la biología","Que la salud es el resultado de un equilibrio entre mente, cuerpo y relaciones sociales","Que la aceptación es la única estrategia válida ante el sufrimiento, independientemente de su origen"],
+    ans:1,
+    explain:"<strong>B es correcta.</strong> Es la proposición que atraviesa los tres capítulos: cap. 1 (modo de vivir las situaciones), cap. 5 (modo de estar en las relaciones), cap. 6 (modo de habitar el cuerpo). En los tres casos, el factor determinante no es el contenido de la experiencia sino la calidad de presencia con la que se vive. A cae en el voluntarismo mental. C introduce un idealismo que el texto no defiende. D es el modelo biopsicosocial clásico, distinto al argumento del libro. E confunde acoger con aceptación pasiva."
+  }
+];
+
+let cur=0,score=0,answered=false,sel=-1,results=[];
+
+function pct(){return Math.round((cur/Q.length)*100)}
+
+function render(){
+  const q=Q[cur];
+  document.getElementById('prog').style.width=pct()+'%';
+  document.getElementById('qnum').textContent=`Pregunta ${cur+1} de ${Q.length}`;
+  document.getElementById('scoreshow').textContent=`${score} correcta${score!==1?'s':''}`;
+  document.getElementById('root').innerHTML=`
+    <div class="qtype">${q.tipo}</div>
+    <div class="stem">${q.stem}</div>
+    <div class="options" id="opts">
+      ${q.opts.map((o,i)=>`
+        <div class="opt" id="opt${i}" onclick="pick(${i})">
+          <div class="letter">${'ABCDE'[i]}</div>
+          <div class="opt-text">${o}</div>
+        </div>`).join('')}
+    </div>
+    <div class="explain" id="exp"></div>
+    <button class="btn btn-check" id="btnC" onclick="check()" disabled>Confirmar respuesta</button>
+    <button class="btn btn-next" id="btnN" onclick="next()" style="display:none">${cur<Q.length-1?'Siguiente →':'Ver resultados →'}</button>
+  `;
+}
+
+function pick(i){
+  if(answered)return;
+  sel=i;
+  document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i));
+  document.getElementById('btnC').disabled=false;
+}
+
+function check(){
+  if(answered||sel<0)return;
+  answered=true;
+  const q=Q[cur];
+  const ok=sel===q.ans;
+  if(ok)score++;
+  results.push({ok});
+  document.querySelectorAll('.opt').forEach((el,j)=>{
+    el.classList.remove('selected');
+    if(j===q.ans)el.classList.add(ok&&j===sel?'correct':'show-correct');
+    if(!ok&&j===sel)el.classList.add('wrong');
+  });
+  const exp=document.getElementById('exp');
+  exp.className='explain '+(ok?'correct':'wrong');
+  exp.innerHTML=(ok?'✓ Correcto. ':'✗ Incorrecto. ')+q.explain;
+  exp.style.display='block';
+  document.getElementById('btnC').style.display='none';
+  document.getElementById('btnN').style.display='block';
+  document.getElementById('scoreshow').textContent=`${score} correcta${score!==1?'s':''}`;
+}
+
+function next(){
+  cur++;answered=false;sel=-1;
+  if(cur>=Q.length)renderResults();
+  else render();
+}
+
+function renderResults(){
+  const pctS=Math.round((score/Q.length)*100);
+  let perf,sub;
+  if(pctS>=90){perf='Excepcional';sub='Comprensión profunda del capítulo 6 y su conexión con el marco general del libro.'}
+  else if(pctS>=70){perf='Competente';sub='Buena comprensión. Revisa las preguntas de síntesis entre capítulos y las de inferencia filosófica.'}
+  else if(pctS>=50){perf='En desarrollo';sub='Conceptos centrales entendidos. Refuerza la distinción habitar/tener y el argumento del cuerpo como mensaje.'}
+  else{perf='Necesita revisión';sub='Vuelve a la Conversación 6, especialmente la relación entre imagen corporal, rechazo y biología de la supervivencia.'}
+  document.getElementById('prog').style.width='100%';
+  document.getElementById('qnum').textContent='Completado';
+  document.getElementById('scoreshow').textContent=`${score} de ${Q.length}`;
+  document.getElementById('root').innerHTML=`
+    <div class="results">
+      <div class="score-big">${pctS}%</div>
+      <div class="score-label">${score} de ${Q.length} respuestas correctas</div>
+      <div class="perf">${perf}</div>
+      <div class="perf-sub">${sub}</div>
+      <div class="divider"></div>
+      <div style="text-align:left;margin-bottom:1rem">
+        <div style="font-size:12px;color:#9A9A90;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.4px">Detalle por pregunta</div>
+        ${results.map((r,i)=>`
+          <div class="detail-row">
+            <div class="dot" style="background:${r.ok?'#2C7A3C':'#A32D2D'}"></div>
+            <span>P${i+1}</span>
+            <span style="font-size:11px;color:#9A9A90">${Q[i].tipo}</span>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-restart" onclick="restart()">↺ Reiniciar quiz</button>
+    </div>`;
+}
+
+function restart(){cur=0;score=0;answered=false;sel=-1;results=[];render();}
+render();
+</script>
+</body>
+</html>
