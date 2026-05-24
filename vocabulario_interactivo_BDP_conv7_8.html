@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vocabulario · La Biología del Presente · Conv. 7 & 8</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Forum&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',system-ui,sans-serif;background:#FAF7F4;color:#1A232E;min-height:100vh}
+.app{max-width:900px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.2rem;border-bottom:1.5px solid #514236}
+.brand{font-size:11px;letter-spacing:3px;color:#514236;text-transform:uppercase}
+.brand-sub{font-size:12px;color:#4A6D70;font-style:italic;margin-top:3px}
+.tab-row{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
+.tab{padding:.55rem 1.2rem;border-radius:8px;border:1.5px solid #514236;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#514236;transition:all .2s}
+.tab.active{background:#514236;color:#FAF7F4}
+.tab.t2{border-color:#2F5D62;color:#2F5D62}
+.tab.t2.active{background:#2F5D62;color:#FAF7F4}
+.section-title{font-family:'Jost',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:1.2rem}
+.s7{color:#514236}.s8{color:#2F5D62}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.node{border-radius:10px;padding:.75rem 1rem;cursor:pointer;border:1.5px solid transparent;transition:border-color .18s,background .18s}
+.node.c7{background:#F4F0EB;border-color:#c9b8a8}
+.node.c7:hover,.node.c7.open{background:#ede0d0;border-color:#514236}
+.node.c8{background:#EEF4F5;border-color:#b8d0d4}
+.node.c8:hover,.node.c8.open{background:#d8eaed;border-color:#2F5D62}
+.node-label{font-size:13px;font-weight:500;line-height:1.35}
+.node.c7 .node-label{color:#3a2e24}
+.node.c8 .node-label{color:#1e3e42}
+.node-hint{font-size:11px;margin-top:3px;opacity:.6}
+.node.c7 .node-hint{color:#514236}
+.node.c8 .node-hint{color:#2F5D62}
+.def-panel{margin-top:1.5rem;border-radius:12px;padding:1.4rem 1.6rem;display:none}
+.def-panel.show{display:block}
+.def-panel.p7{background:#fff;border-left:4px solid #514236}
+.def-panel.p8{background:#fff;border-left:4px solid #2F5D62}
+.def-term{font-family:'Jost',sans-serif;font-size:17px;font-weight:500;margin-bottom:.5rem}
+.def-panel.p7 .def-term{color:#514236}
+.def-panel.p8 .def-term{color:#2F5D62}
+.def-context{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-bottom:.8rem;opacity:.7}
+.def-panel.p7 .def-context{color:#514236}
+.def-panel.p8 .def-context{color:#2F5D62}
+.def-text{font-family:'Forum',Georgia,serif;font-size:15.5px;color:#2C2C2C;line-height:1.75}
+.def-quote{margin-top:.9rem;padding:.7rem 1rem;background:#F4F0EB;border-radius:0;border-left:2px solid #4A6D70;font-family:'Forum',Georgia,serif;font-size:14px;font-style:italic;color:#2F5D62;line-height:1.6}
+.def-panel.p8 .def-quote{background:#EEF4F5}
+.close-btn{float:right;font-size:11px;font-family:'Jost',sans-serif;color:#888;cursor:pointer;border:none;background:none;padding:0;letter-spacing:1px;text-transform:uppercase}
+.close-btn:hover{color:#514236}
+.counter{font-size:12px;color:#888;margin-top:1.5rem;text-align:right;font-style:italic}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div>
+      <div class="brand">Spring Up · Atelier de Vida · Tercer Espacio</div>
+      <div class="brand-sub">La Biología del Presente · Vocabulario conceptual interactivo</div>
+    </div>
+    <div style="font-size:11px;color:#888;text-align:right">Pulsa cada término<br>para ver su definición</div>
+  </div>
+  <div class="tab-row">
+    <button class="tab active" onclick="showCap(7)">Conversación 7 · Anticuerpos para no sentir</button>
+    <button class="tab t2" onclick="showCap(8)">Conversación 8 · Poniendo voz a tu honestidad</button>
+  </div>
+  <div id="view7">
+    <div class="section-title s7">Conversación 7 — términos clave</div>
+    <div class="grid" id="grid7"></div>
+  </div>
+  <div id="view8" style="display:none">
+    <div class="section-title s8">Conversación 8 — términos clave</div>
+    <div class="grid" id="grid8"></div>
+  </div>
+  <div id="def-panel" class="def-panel">
+    <button class="close-btn" onclick="closePanel()">cerrar ×</button>
+    <div class="def-context" id="def-ctx"></div>
+    <div class="def-term" id="def-term"></div>
+    <div class="def-text" id="def-text"></div>
+    <div class="def-quote" id="def-quote" style="display:none"></div>
+  </div>
+  <div class="counter" id="counter"></div>
+</div>
+<script>
+const V7=[
+  {t:"El intérprete neuronal",d:"Módulo del hemisferio cerebral izquierdo que genera pensamientos de forma continua — igual que el corazón bombea sangre. No podemos apagarlo. Su función es proponer narrativas sobre lo que percibimos, pero sus propuestas no son órdenes ni verdades: son posibilidades.",q:"«La mayoría de las conversaciones que mantenemos son con el intérprete, sin saberlo.»"},
+  {t:"Propuesta neuronal",d:"Todo pensamiento es una propuesta del intérprete — no un hecho, no una definición de quién eres. Reconocer un pensamiento como propuesta abre espacio entre el estímulo y la respuesta. Lo que antes era culpa automática se convierte en responsabilidad consciente.",q:"«Ante el pensamiento 'Podrías coger la leña', yo añado el contexto. El pensamiento en sí no me está pidiendo nada.»"},
+  {t:"Biología de la supervivencia",d:"El conjunto de respuestas fisiológicas (cortisol, adrenalina, noradrenalina) que el organismo activa cuando percibe una amenaza. Diseñada para emergencias reales, se activa el 98% del tiempo ante amenazas imaginarias: conversaciones temidas, recuerdos dolorosos, proyecciones futuras.",q:""},
+  {t:"Respuesta lucha-huida",d:"La reacción automática de la amígdala ante una amenaza percibida: atacar o escapar. Útil ante depredadores reales. Problemática cuando se activa ante el correo del jefe, una discusión imaginada o el miedo a ser juzgado.",q:""},
+  {t:"Amígdala",d:"Agrupación de neuronas con forma de almendra en el lóbulo temporal. Protagonista de la biología de supervivencia: conectada con los sentidos, la memoria (hipocampo), las emociones y el sistema ejecutivo. Se asocia con el miedo y — sorprendentemente — también con la confianza.",q:""},
+  {t:"Cortisol / adrenalina / noradrenalina",d:"Las 'hormonas del estrés'. Liberadas por el hipotálamo ante una amenaza percibida. En dosis agudas, salvan vidas. En elevación crónica (8-12 activaciones innecesarias por día), agotan al médico interno y disparan la probabilidad de enfermar.",q:""},
+  {t:"Médico interno",d:"Metáfora del libro para el sistema de autorregulación y sanación del organismo. Con 3.600 millones de años de experiencia evolutiva. Cuando la biología de supervivencia se sostiene crónicamente, el médico interno queda sin energía.",q:"«El 70% de las visitas al médico de cabecera están relacionadas con el estrés crónico y la desconexión de nuestro médico interno.»"},
+  {t:"Emoción agradable / desagradable",d:"La distinción real entre emociones según el libro. No 'positivas' ni 'negativas' — esa clasificación moral es una trampa. Ante las agradables nos abrimos; ante las desagradables, tendemos a cerrarnos y rechazarlas. Ese rechazo, no la emoción, es lo que daña.",q:""},
+  {t:"Anticuerpos emocionales",d:"El concepto central del capítulo: cuando huimos de una emoción como si fuera un monstruo, activamos biología de supervivencia contra nosotros mismos. El organismo se ataca a sí mismo, igual que en una enfermedad autoinmune.",q:"«Huir de una emoción fomenta una biología de supervivencia totalmente fuera de lugar, ya que estaríamos tratando de protegernos de nosotros mismos.»"},
+  {t:"Alinear conducta y organismo",d:"La solución que propone el capítulo: actuar en coherencia con cómo el organismo está diseñado para funcionar. Eso significa sentir las emociones en lugar de huir de ellas. No cambia la experiencia — cambia radicalmente la relación con ella.",q:""},
+  {t:"Redistribución de energía",d:"Cuando la biología de supervivencia se activa, el organismo redistribuye energía hacia los sistemas de emergencia y la retira de los procesos de largo plazo: digestión, sistema inmune, reproducción, regeneración celular.",q:""},
+  {t:"Biología del presente",d:"El estado opuesto a la biología de supervivencia. Activa cuando el organismo no percibe amenaza. Fomenta la oxitocina y la serotonina, potencia el médico interno. Se vive cuando uno se relaciona pacíficamente con sus pensamientos y emociones.",q:"«Eres consciente de cómo funciona tu mente y tu organismo. Eres uno con él. Eres biología. Eres presente.»"},
+];
+const V8=[
+  {t:"Emoción (construcción cerebral)",d:"Según la neurociencia contemporánea, las emociones no son respuestas fijas a estímulos: son predicciones que el cerebro construye. No existen 'áreas cerebrales de las emociones' universales. Lo que construye la emoción es un pensamiento con atención sostenida.",q:"«No existen áreas cerebrales de las emociones que se activen cuando sentimos una emoción.»"},
+  {t:"Predicción emocional",d:"El cerebro no espera la emoción — la anticipa. A partir de los pensamientos que sostiene con atención, genera una predicción de cómo debería sentirse el organismo. Esa predicción es la emoción. Por eso dos personas ante la misma situación sienten cosas distintas.",q:""},
+  {t:"Redes neuronales interoceptivas",d:"Las redes que registran y procesan el estado interno del cuerpo. Son el sustrato biológico de la construcción emocional: traducen pensamientos sostenidos en sensaciones corporales reconocibles como emociones.",q:""},
+  {t:"Pensamiento generador",d:"El pensamiento que precede y construye una emoción. Identificarlo es clave: cuando puedes encontrar el pensamiento generador de lo que sientes, la emoción deja de ser opaca. Cuando no puedes encontrarlo, puede que estés ante una emoción enredada.",q:""},
+  {t:"Emoción enredada",d:"Una emoción cuyo pensamiento generador se perdió — generalmente por estrés intenso o trauma, cuando el cortisol interrumpe la consolidación de la memoria en el hipocampo. Aparece sola, intensa, irracional, sin causa aparente. Se confunde con estados depresivos.",q:"«¿Cómo sabes que es una emoción enredada? Porque eres incapaz de identificar el pensamiento generador.»"},
+  {t:"Pensamientos esenciales",d:"El tercer tipo de pensamientos: perdón, gratitud, aceptación, creatividad. Emergen de las redes neuronales involuntarias. Son el 5% del tiempo — escasos y poderosos. Los protagonistas reales de la biología del presente.",q:"«Los pensamientos esenciales llevaron a Arquímedes a resolver el dilema de la corona. Son capaces de resolver los grandes enigmas de la humanidad en un pispás.»"},
+  {t:"Pensaciones",d:"Nombre que usa el libro para los pensamientos cotidianos: propuestas del intérprete basadas en experiencia pasada. Representan el 85-90% de los pensamientos. El ruido de fondo habitual de la mente en piloto automático.",q:""},
+  {t:"Red neuronal por defecto",d:"La red cerebral activa cuando no estamos focalizados en ninguna tarea externa. Es el hogar de los pensamientos esenciales y la creatividad profunda. La confianza y la honestidad son sus máximos promotores.",q:""},
+  {t:"Corteza cingulada anterior",d:"Región cerebral que funciona como detector de honestidad. Se activa cuando usamos un pensamiento deshonesto — aunque sea solo con nosotros mismos, sin verbalizarlo. Es la base neurológica de por qué la honestidad es biológica, no solo moral.",q:"«No hace falta verbalizar una mentira para que se active el detector de honestidad.»"},
+  {t:"Honestidad biológica",d:"La redefinición del libro: la honestidad no es decir la verdad a los demás — es ver lo que ocurre en el propio mundo interior sin huir de ello. Una linterna hacia adentro. Condición para que emerjan los pensamientos esenciales.",q:"«La honestidad es un acto de empatía con uno mismo.»"},
+  {t:"Confianza genuina",d:"La confianza que no negocia — sin agenda, sin condición. Distinta de 'confiar para no pasarlo mal', que es miedo disfrazado. Miedo y confianza usan las mismas redes neuronales: en cada situación elegimos uno u otro.",q:"«Llevaba veinte años intentando confiar. ¿Por qué? 'Para no pasarlo mal y encontrar novio'. Ahí descubrimos el pastel.»"},
+  {t:"Pensamiento deshonesto",d:"Un pensamiento que no refleja lo que realmente está ocurriendo en el mundo interior — una evasión, una racionalización, un autoengaño. El cerebro lo detecta aunque no lo verbalices. Bloquea el acceso a la red neuronal por defecto.",q:""},
+  {t:"Reeducar el cerebro",d:"El proceso práctico que introduce la Conversación 8: aprender a identificar qué pensamientos son útiles y cuáles no, y acompañar al organismo a soltar los que provienen del miedo. Se hace desde adentro con honestidad y confianza.",q:""},
+  {t:"Propiedad del presente",d:"Los pensamientos esenciales pertenecen al instante en que ocurren. Si intentas sacarlos de ese instante para llevarlos a otro momento, se convierten automáticamente en pensaciones. El perdón y la gratitud genuinos no se planifican — ocurren.",q:"«Cada vez que intentas sacar un pensamiento esencial del instante presente, automáticamente se convierte en una pensación.»"},
+  {t:"Sincronía cerebral",d:"Estado en que distintas regiones cerebrales trabajan en coherencia. Propiciado por la confianza y la honestidad. Cuando dos personas lo comparten, emerge la 'atención colectiva' — condición para que los pensamientos esenciales aparezcan en contextos compartidos.",q:""},
+];
+let openNode=null,currentCap=7;
+function buildGrid(data,cap){
+  const grid=document.getElementById('grid'+cap);
+  data.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='node c'+cap;
+    d.id='node-'+cap+'-'+i;
+    d.innerHTML=`<div class="node-label">${item.t}</div><div class="node-hint">pulsar para definir</div>`;
+    d.onclick=()=>toggle(cap,i,item);
+    grid.appendChild(d);
+  });
+}
+function toggle(cap,idx,item){
+  const nodeId='node-'+cap+'-'+idx;
+  const panel=document.getElementById('def-panel');
+  if(openNode===nodeId){closePanel();return;}
+  if(openNode){const prev=document.getElementById(openNode);if(prev)prev.classList.remove('open');}
+  openNode=nodeId;
+  document.getElementById(nodeId).classList.add('open');
+  panel.className='def-panel show p'+cap;
+  document.getElementById('def-ctx').textContent='Conversación '+cap+' · La Biología del Presente';
+  document.getElementById('def-term').textContent=item.t;
+  document.getElementById('def-text').textContent=item.d;
+  const qEl=document.getElementById('def-quote');
+  if(item.q){qEl.textContent=item.q;qEl.style.display='block';}else{qEl.style.display='none';}
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  updateCounter(cap);
+}
+function closePanel(){
+  if(openNode){const prev=document.getElementById(openNode);if(prev)prev.classList.remove('open');openNode=null;}
+  document.getElementById('def-panel').className='def-panel';
+  updateCounter(currentCap);
+}
+function showCap(n){
+  currentCap=n;closePanel();
+  document.getElementById('view7').style.display=n===7?'block':'none';
+  document.getElementById('view8').style.display=n===8?'block':'none';
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',(i===0&&n===7)||(i===1&&n===8));});
+  updateCounter(n);
+}
+function updateCounter(n){
+  const total=n===7?V7.length:V8.length;
+  document.getElementById('counter').textContent=total+' términos · Conversación '+n;
+}
+buildGrid(V7,7);buildGrid(V8,8);updateCounter(7);
+</script>
+</body>
+</html>
