@@ -1,0 +1,235 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',system-ui,sans-serif;background:transparent}
+.qz{max-width:660px;padding:0 0 2rem}
+.qz-head{background:#2F5D62;border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.qz-brand{font-size:11px;letter-spacing:2px;color:#9FE1CB;text-transform:uppercase}
+.qz-conv{font-size:13px;color:#d4eeeb;font-style:italic}
+.progress-bar{background:#e0eeef;border-radius:8px;height:6px;margin-bottom:1.2rem;overflow:hidden}
+.progress-fill{height:100%;background:#514236;border-radius:8px;transition:width .4s ease}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:#2F5D62;margin-bottom:.5rem;font-weight:500}
+.card{background:#fff;border:0.5px solid #ddd;border-radius:12px;padding:1.4rem 1.5rem;margin-bottom:1rem}
+.nivel-badge{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#514236;border:1px solid #514236;border-radius:4px;padding:2px 8px;margin-bottom:.8rem}
+.qnum{font-size:12px;color:#888;margin-bottom:.4rem;font-weight:500}
+.qtext{font-size:15px;color:#1A232E;line-height:1.65;font-family:Georgia,serif}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1.1rem}
+.opt{background:#F4F0EB;border:1.5px solid #d9cfc6;border-radius:8px;padding:.75rem 1rem;cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:border-color .15s,background .15s;font-size:14px;color:#1A232E;line-height:1.5;text-align:left}
+.opt:hover:not(.disabled){border-color:#514236;background:#ede5db}
+.opt.disabled{cursor:default}
+.opt.correct{background:#d6f0e1;border-color:#1E8A5A;color:#1E4D35}
+.opt.wrong{background:#fce8e8;border-color:#c0392b;color:#7a1a1a}
+.opt.unselected{opacity:.55}
+.opt-letter{font-weight:700;font-size:13px;min-width:20px;color:#514236}
+.opt.correct .opt-letter{color:#1E8A5A}
+.opt.wrong .opt-letter{color:#c0392b}
+.feedback{display:none;margin-top:1rem;padding:.9rem 1.1rem;border-radius:8px;font-size:14px;line-height:1.6;font-family:Georgia,serif}
+.feedback.correct-fb{background:#d6f0e1;border-left:4px solid #1E8A5A;color:#1E4D35}
+.feedback.wrong-fb{background:#FFF0F0;border-left:4px solid #c0392b;color:#7a1a1a}
+.fb-title{font-family:'Jost',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.btn{font-family:'Jost',sans-serif;font-size:13px;font-weight:500;padding:.55rem 1.2rem;border-radius:8px;border:1.5px solid #2F5D62;color:#2F5D62;background:transparent;cursor:pointer;transition:background .15s,color .15s}
+.btn:hover{background:#2F5D62;color:#fff}
+.btn-primary{background:#2F5D62;color:#fff}
+.btn-primary:hover{background:#1e3e42}
+.btn:disabled{opacity:.35;cursor:default}
+.score-screen{display:none;text-align:center;padding:2rem 1rem}
+.score-big{font-size:56px;font-weight:700;color:#2F5D62;line-height:1}
+.score-sub{font-size:15px;color:#514236;margin-top:.5rem;font-family:Georgia,serif;font-style:italic}
+.score-msg{margin-top:1.5rem;font-size:14px;color:#1A232E;line-height:1.7;font-family:Georgia,serif;max-width:480px;margin-left:auto;margin-right:auto}
+.score-bars{margin:1.5rem auto;max-width:420px}
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px;color:#2F5D62;font-weight:500}
+.score-track{flex:1;background:#F4F0EB;border-radius:4px;height:8px}
+.score-fill{height:100%;border-radius:4px;background:#514236}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="qz" id="app">
+  <div class="qz-head">
+    <div>
+      <div class="qz-brand">Spring Up · Tercer Espacio</div>
+      <div class="qz-conv">Conversación 8 · Poniendo voz a tu honestidad</div>
+    </div>
+    <div style="font-size:13px;color:#9FE1CB;font-weight:500" id="score-live">0 / 8</div>
+  </div>
+
+  <div id="quiz-area">
+    <div class="progress-label">
+      <span id="prog-text">Pregunta 1 de 8</span>
+      <span id="nivel-text"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:12.5%"></div></div>
+
+    <div class="card">
+      <div class="nivel-badge" id="nivel-badge"></div>
+      <div class="qnum" id="qnum"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback">
+        <div class="fb-title" id="fb-title"></div>
+        <div id="fb-text"></div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn" id="btn-prev" onclick="prev()">Anterior</button>
+      <button class="btn btn-primary" id="btn-next" onclick="next()" disabled>Siguiente</button>
+    </div>
+  </div>
+
+  <div class="score-screen" id="score-screen">
+    <div class="score-big" id="score-num"></div>
+    <div class="score-sub">respuestas correctas de 8</div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-bars" id="score-bars"></div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="restart()">Intentar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const Qs = [
+  {
+    nivel:"Comprensión directa",
+    q:"Según la neurociencia que cita el capítulo, ¿cómo se genera una emoción?",
+    opts:["Se activan áreas cerebrales específicas para cada emoción universal.","Las emociones son innatas y están preprogramadas genéticamente.","Un pensamiento con atención sostenida genera una predicción emocional controlada por redes neuronales interoceptivas.","El sistema límbico produce emociones en respuesta a estímulos externos."],
+    correct:2,
+    why:"El capítulo rompe con la visión clásica: «No existen áreas cerebrales de las emociones que se activen cuando sentimos una emoción.» Las emociones son construcciones — predicciones que el cerebro genera a partir de los pensamientos a los que prestamos atención sostenida."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Qué es una «emoción enredada» según David del Rosario?",
+    opts:["Una emoción muy intensa que no podemos controlar.","Una emoción cuyo pensamiento generador se perdió, generalmente por estrés o trauma.","Una emoción negativa acumulada durante años.","Una emoción que surge de la interacción con otras personas."],
+    correct:1,
+    why:"Las emociones enredadas son aquellas en las que el pensamiento generador y la emoción se «divorciaron» — por altas concentraciones de cortisol que interrumpen la consolidación de la memoria en el hipocampo. Son intensas, irracionales, desconcertantes, y se confunden con estados depresivos."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Cuáles son los tres tipos de pensamientos que describe el capítulo?",
+    opts:["Pensamientos conscientes, inconscientes y automáticos.","Pensamientos positivos, negativos y neutros.","Pensamientos cotidianos (pensaciones), emociones enredadas y pensamientos esenciales.","Pensamientos límite, tácitos y creativos."],
+    correct:2,
+    why:"David distingue: los pensamientos cotidianos basados en el pasado (pensaciones), las emociones enredadas que visitan el 10% del tiempo, y los pensamientos esenciales — perdón, gratitud, aceptación, creatividad — que ocurren el 5% del tiempo y son los protagonistas reales de la biología del presente."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Qué revela el detector de honestidad ubicado en la corteza cingulada anterior?",
+    opts:["Que el cerebro detecta cuando mentimos a otras personas.","Que el cerebro se activa incluso con pensamientos deshonestos con uno mismo, sin necesidad de verbalizarlos.","Que la honestidad genera oxitocina y mejora las relaciones.","Que las personas honestas tienen mayor actividad en el hemisferio izquierdo."],
+    correct:1,
+    why:"El capítulo cita investigaciones con imagen médica: «No hace falta verbalizar una mentira para activar el detector de honestidad. Con usar un pensamiento deshonesto el organismo activa la señal de alerta.» La honestidad, concluye, no es virtud social — es empatía con uno mismo."
+  },
+  {
+    nivel:"Inferencia",
+    q:"Una persona lleva 20 años «intentando confiar» para no pasarlo mal y encontrar pareja. Según el capítulo, ¿qué está haciendo en realidad?",
+    opts:["Practicando la confianza genuina de forma sostenida.","Usando la confianza como herramienta de crecimiento personal.","Negociando con la vida desde el miedo disfrazado de confianza.","Activando la red neuronal por defecto correctamente."],
+    correct:2,
+    why:"El capítulo ilustra esto con un caso real: la mujer que confía «para no pasarlo mal y encontrar novio». David comenta: «Ahí descubrimos el pastel. Negociamos constantemente con la vida.» Miedo y confianza usan las mismas redes neuronales — la diferencia está en si hay agenda o no."
+  },
+  {
+    nivel:"Inferencia",
+    q:"¿Por qué los pensamientos esenciales son «propiedad del presente» y no se pueden planificar?",
+    opts:["Porque solo surgen durante la meditación profunda.","Porque pertenecen al instante en que ocurren — trasladarlos a otro momento los convierte en pensaciones del pasado.","Porque el cerebro no puede sostenerlos más de unos segundos.","Porque requieren ausencia total de estrés para emerger."],
+    correct:1,
+    why:"El capítulo lo dice con precisión: «Cada vez que intentas sacar un pensamiento esencial del instante al que pertenece para llevarlo a otro instante, automáticamente se convierte en una pensación.» El perdón y la gratitud genuinos no se invocan — ocurren cuando el campo mental está disponible."
+  },
+  {
+    nivel:"Síntesis",
+    q:"¿Cuáles son los dos máximos promotores de la red neuronal por defecto y los pensamientos esenciales?",
+    opts:["La meditación y el ejercicio físico.","La gratitud y el perdón.","La confianza y la honestidad.","El silencio y la soledad."],
+    correct:2,
+    why:"El capítulo lo establece al vincular la red neuronal por defecto con los estados que permiten los pensamientos esenciales. Los dos grandes promotores de ese campo son la confianza genuina (sin agenda) y la honestidad biológica (mirar adentro sin huir). Esta será la puerta de entrada a la Conversación 9."
+  },
+  {
+    nivel:"Síntesis",
+    q:"Completa la idea del capítulo: «La honestidad es ___»",
+    opts:["«...decir la verdad a los demás en todo momento.»","«...una virtud moral que nos hace mejores personas.»","«...un acto de empatía con uno mismo: ver lo que ocurre internamente sin huir de ello.»","«...la capacidad de reconocer nuestros errores públicamente.»"],
+    correct:2,
+    why:"El capítulo reformula completamente el concepto: «La honestidad no tiene nada que ver con decir mentiras a los demás. La honestidad es un acto de empatía con uno mismo.» Y añade: «¿Y la paz? La paz es un acto de empatía de uno mismo con la humanidad.»"
+  }
+];
+
+let cur=0, score=0, answered=[];
+
+function render(){
+  const q=Qs[cur];
+  document.getElementById('prog-text').textContent=`Pregunta ${cur+1} de 8`;
+  document.getElementById('nivel-text').textContent=q.nivel;
+  document.getElementById('prog-fill').style.width=((cur+1)/8*100)+'%';
+  document.getElementById('nivel-badge').textContent=q.nivel;
+  document.getElementById('qnum').textContent=`Pregunta ${cur+1}`;
+  document.getElementById('qtext').textContent=q.q;
+  const optsEl=document.getElementById('opts');
+  optsEl.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';
+    d.innerHTML=`<span class="opt-letter">${letters[i]}</span><span>${o}</span>`;
+    if(answered[cur]!==undefined){
+      d.classList.add('disabled');
+      if(i===q.correct) d.classList.add('correct');
+      else if(i===answered[cur]) d.classList.add('wrong');
+      else d.classList.add('unselected');
+    } else {
+      d.onclick=()=>select(i);
+    }
+    optsEl.appendChild(d);
+  });
+  const fb=document.getElementById('feedback');
+  if(answered[cur]!==undefined){
+    const correct=answered[cur]===q.correct;
+    fb.style.display='block';
+    fb.className='feedback '+(correct?'correct-fb':'wrong-fb');
+    document.getElementById('fb-title').textContent=correct?'Correcto':'Incorrecto — Respuesta: '+letters[q.correct];
+    document.getElementById('fb-text').textContent=q.why;
+    document.getElementById('btn-next').disabled=false;
+  } else {
+    fb.style.display='none';
+    document.getElementById('btn-next').disabled=true;
+  }
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===7?'Ver resultados':'Siguiente';
+  document.getElementById('score-live').textContent=score+' / 8';
+}
+
+function select(i){
+  if(answered[cur]!==undefined) return;
+  answered[cur]=i;
+  if(i===Qs[cur].correct) score++;
+  render();
+}
+
+function next(){
+  if(cur===7){ showScore(); return; }
+  cur++; render();
+}
+
+function prev(){
+  if(cur>0){ cur--; render(); }
+}
+
+function showScore(){
+  document.getElementById('quiz-area').style.display='none';
+  const ss=document.getElementById('score-screen');
+  ss.style.display='block';
+  document.getElementById('score-num').textContent=score+'/8';
+  const msgs=['Sigue explorando el capítulo — cada relectura abre nuevas capas.','Buen comienzo. Hay ideas que vale la pena revisar con calma.','Muy bien. Estás captando los conceptos centrales del capítulo.','Excelente. Dominas las ideas de esta conversación.'];
+  const mi=score<=2?0:score<=4?1:score<=6?2:3;
+  document.getElementById('score-msg').textContent=msgs[mi];
+  const niveles={};
+  Qs.forEach((q,i)=>{ const n=q.nivel; if(!niveles[n])niveles[n]={total:0,ok:0}; niveles[n].total++; if(answered[i]===q.correct)niveles[n].ok++; });
+  const bars=document.getElementById('score-bars');
+  bars.innerHTML='';
+  Object.entries(niveles).forEach(([n,v])=>{
+    const pct=Math.round(v.ok/v.total*100);
+    bars.innerHTML+=`<div class="score-row"><span style="min-width:160px">${n}</span><div class="score-track"><div class="score-fill" style="width:${pct}%"></div></div><span style="min-width:36px;text-align:right">${v.ok}/${v.total}</span></div>`;
+  });
+}
+
+function restart(){
+  cur=0; score=0; answered=[];
+  document.getElementById('quiz-area').style.display='block';
+  document.getElementById('score-screen').style.display='none';
+  render();
+}
+
+render();
+</script>
