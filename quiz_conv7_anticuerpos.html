@@ -1,0 +1,235 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',system-ui,sans-serif;background:transparent}
+.qz{max-width:660px;padding:0 0 2rem}
+.qz-head{background:#514236;border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.qz-brand{font-size:11px;letter-spacing:2px;color:#c9a87c;text-transform:uppercase}
+.qz-conv{font-size:13px;color:#e8d9c8;font-style:italic}
+.progress-bar{background:#3a2e26;border-radius:8px;height:6px;margin-bottom:1.2rem;overflow:hidden}
+.progress-fill{height:100%;background:#4A6D70;border-radius:8px;transition:width .4s ease}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:#514236;margin-bottom:.5rem;font-weight:500}
+.card{background:#fff;border:0.5px solid #ddd;border-radius:12px;padding:1.4rem 1.5rem;margin-bottom:1rem}
+.nivel-badge{display:inline-block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#4A6D70;border:1px solid #4A6D70;border-radius:4px;padding:2px 8px;margin-bottom:.8rem}
+.qnum{font-size:12px;color:#888;margin-bottom:.4rem;font-weight:500}
+.qtext{font-size:15px;color:#1A232E;line-height:1.65;font-family:Georgia,serif}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1.1rem}
+.opt{background:#EEF4F5;border:1.5px solid #d0e4e7;border-radius:8px;padding:.75rem 1rem;cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:border-color .15s,background .15s;font-size:14px;color:#1A232E;line-height:1.5;text-align:left}
+.opt:hover:not(.disabled){border-color:#4A6D70;background:#dff0f3}
+.opt.disabled{cursor:default}
+.opt.correct{background:#d6f0e1;border-color:#1E8A5A;color:#1E4D35}
+.opt.wrong{background:#fce8e8;border-color:#c0392b;color:#7a1a1a}
+.opt.unselected{opacity:.55}
+.opt-letter{font-weight:700;font-size:13px;min-width:20px;color:#2F5D62}
+.opt.correct .opt-letter{color:#1E8A5A}
+.opt.wrong .opt-letter{color:#c0392b}
+.feedback{display:none;margin-top:1rem;padding:.9rem 1.1rem;border-radius:8px;font-size:14px;line-height:1.6;font-family:Georgia,serif}
+.feedback.correct-fb{background:#d6f0e1;border-left:4px solid #1E8A5A;color:#1E4D35}
+.feedback.wrong-fb{background:#FFF0F0;border-left:4px solid #c0392b;color:#7a1a1a}
+.fb-title{font-family:'Jost',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.btn{font-family:'Jost',sans-serif;font-size:13px;font-weight:500;padding:.55rem 1.2rem;border-radius:8px;border:1.5px solid #514236;color:#514236;background:transparent;cursor:pointer;transition:background .15s,color .15s}
+.btn:hover{background:#514236;color:#fff}
+.btn-primary{background:#514236;color:#fff}
+.btn-primary:hover{background:#3a2e26}
+.btn:disabled{opacity:.35;cursor:default}
+.score-screen{display:none;text-align:center;padding:2rem 1rem}
+.score-big{font-size:56px;font-weight:700;color:#514236;line-height:1}
+.score-sub{font-size:15px;color:#4A6D70;margin-top:.5rem;font-family:Georgia,serif;font-style:italic}
+.score-msg{margin-top:1.5rem;font-size:14px;color:#1A232E;line-height:1.7;font-family:Georgia,serif;max-width:480px;margin-left:auto;margin-right:auto}
+.score-bars{margin:1.5rem auto;max-width:420px}
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px;color:#514236;font-weight:500}
+.score-track{flex:1;background:#EEF4F5;border-radius:4px;height:8px}
+.score-fill{height:100%;border-radius:4px;background:#4A6D70}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+
+<div class="qz" id="app">
+  <div class="qz-head">
+    <div>
+      <div class="qz-brand">Spring Up · Tercer Espacio</div>
+      <div class="qz-conv">Conversación 7 · Anticuerpos para no sentir</div>
+    </div>
+    <div style="font-size:13px;color:#c9a87c;font-weight:500" id="score-live">0 / 8</div>
+  </div>
+
+  <div id="quiz-area">
+    <div class="progress-label">
+      <span id="prog-text">Pregunta 1 de 8</span>
+      <span id="nivel-text"></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:12.5%"></div></div>
+
+    <div class="card">
+      <div class="nivel-badge" id="nivel-badge"></div>
+      <div class="qnum" id="qnum"></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback">
+        <div class="fb-title" id="fb-title"></div>
+        <div id="fb-text"></div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn" id="btn-prev" onclick="prev()">Anterior</button>
+      <button class="btn btn-primary" id="btn-next" onclick="next()" disabled>Siguiente</button>
+    </div>
+  </div>
+
+  <div class="score-screen" id="score-screen">
+    <div class="score-big" id="score-num"></div>
+    <div class="score-sub">respuestas correctas de 8</div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-bars" id="score-bars"></div>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="restart()">Intentar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const Qs = [
+  {
+    nivel:"Comprensión directa",
+    q:"Sergi Torres entra al garaje y piensa «Podrías coger un poco de leña y llevártela a casa». David entra al mismo garaje y piensa «Frío no vamos a pasar». ¿Qué demuestra esto según el capítulo?",
+    opts:["Que Sergi tiene más frío que David.","Que el pensamiento no procede del estímulo externo, sino del modelo mental interno de cada persona.","Que el hemisferio derecho produce pensamientos de escasez.","Que la leña activa la biología de supervivencia."],
+    correct:1,
+    why:"Si el pensamiento procediera del estímulo (la leña), ambos deberían haber pensado lo mismo. Como no fue así, el pensamiento es una propuesta neuronal basada en la historia personal — no una lectura directa de la realidad."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Qué es una «propuesta neuronal» según David del Rosario?",
+    opts:["Una orden del sistema nervioso que debemos obedecer.","Una idea generada por la biología de supervivencia.","Una predicción del intérprete neuronal que podemos usar o no, y que no nos define.","Un mensaje del cerebro universal que llega en momentos de calma."],
+    correct:2,
+    why:"El intérprete (módulo del hemisferio izquierdo) genera pensamientos igual que el corazón bombea sangre. Son propuestas — no mandatos. Reconocer eso devuelve la posibilidad de elegir y transforma la culpa en responsabilidad."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"Según el capítulo, ¿qué daña realmente al organismo en relación a las emociones?",
+    opts:["Sentir emociones intensas como rabia o miedo.","El rechazo sostenido a ciertas emociones, no las emociones en sí mismas.","Las emociones negativas, porque generan cortisol.","No gestionar adecuadamente las emociones mediante técnicas."],
+    correct:1,
+    why:"Sergi Torres lo plantea con precisión: las emociones no son buenas ni malas — son agradables o desagradables. El rechazo a las desagradables — excluir una parte de nosotros — es lo que daña el organismo."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Qué son los «anticuerpos emocionales» según el capítulo?",
+    opts:["Recursos del cerebro para neutralizar emociones tóxicas.","El mecanismo por el cual el organismo se ataca a sí mismo al huir de sus propias emociones.","Pensamientos que bloquean el sistema inmunológico.","Reacciones físicas al estrés crónico."],
+    correct:1,
+    why:"Cuando huimos de una emoción como de un monstruo, activamos biología de supervivencia «fuera de lugar» porque nos estamos protegiendo de nosotros mismos — igual que el sistema inmune en enfermedades autoinmunes."
+  },
+  {
+    nivel:"Inferencia",
+    q:"El capítulo dice que el 98% del tiempo la biología de supervivencia se activa por causas no reales. ¿Cuál es la consecuencia práctica?",
+    opts:["Que debemos suprimir nuestra respuesta al estrés.","Que el estrés crónico surge de amenazas imaginadas, y el médico interno queda sin energía para sanar.","Que la amígdala deja de funcionar con el tiempo.","Que la biología de supervivencia es siempre dañina y debe eliminarse."],
+    correct:1,
+    why:"Concatenar entre 8 y 12 amenazas imaginarias por día mantiene el cortisol elevado crónicamente, dejando al médico interno sin energía. El 70% de las visitas al médico estarían relacionadas con este estrés crónico."
+  },
+  {
+    nivel:"Comprensión directa",
+    q:"¿Cuál es la solución que propone el capítulo para dejar de producir anticuerpos emocionales?",
+    opts:["Gestionar las emociones con técnicas de regulación.","Evitar situaciones que generen emociones difíciles.","Alinear la conducta con el funcionamiento del organismo: sentir las emociones en lugar de gestionarlas.","Usar la racionalización para neutralizar el pensamiento generador."],
+    correct:2,
+    why:"David del Rosario es claro: «Las emociones están diseñadas para ser sentidas. No gestionadas.» La alineación no requiere eliminar las emociones — requiere dejar de huir de ellas."
+  },
+  {
+    nivel:"Síntesis",
+    q:"Completa la frase del libro: «Cada episodio de sufrimiento que has experimentado en tu vida tuvo una cosa en común: ___»",
+    opts:["«...estabas en biología de supervivencia.»","«...no habías aprendido a gestionar tus emociones.»","«...tu comportamiento no estaba alineado con la forma de funcionar de tu mente y tu organismo.»","«...alguien o algo externo lo provocó.»"],
+    correct:2,
+    why:"Esta frase sintetiza la Conversación 7: el sufrimiento no viene de las circunstancias sino de la desalineación entre conducta y naturaleza. Restaurar esa alineación transforma la experiencia aunque las circunstancias sean las mismas."
+  },
+  {
+    nivel:"Síntesis",
+    q:"David dice: «La experiencia en sí misma no cambia demasiado. Lo que cambia drásticamente es tu relación con la experiencia.» ¿Qué implica esto?",
+    opts:["Que el objetivo del trabajo personal es eliminar las emociones difíciles.","Que el objetivo es cambiar las circunstancias externas.","Que el cambio profundo no es en los eventos sino en cómo nos relacionamos con ellos — desde la biología del presente.","Que el trabajo personal es inútil porque la experiencia no cambia."],
+    correct:2,
+    why:"La biología del presente no promete una vida sin emociones difíciles. Promete que cuando dejas de luchar con lo que sientes, te vuelves «biología presente» — y desde ahí, la misma situación se experimenta de un modo completamente distinto."
+  }
+];
+
+let cur=0, score=0, answered=[];
+
+function render(){
+  const q=Qs[cur];
+  document.getElementById('prog-text').textContent=`Pregunta ${cur+1} de 8`;
+  document.getElementById('nivel-text').textContent=q.nivel;
+  document.getElementById('prog-fill').style.width=((cur+1)/8*100)+'%';
+  document.getElementById('nivel-badge').textContent=q.nivel;
+  document.getElementById('qnum').textContent=`Pregunta ${cur+1}`;
+  document.getElementById('qtext').textContent=q.q;
+  const optsEl=document.getElementById('opts');
+  optsEl.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';
+    d.innerHTML=`<span class="opt-letter">${letters[i]}</span><span>${o}</span>`;
+    if(answered[cur]!==undefined){
+      d.classList.add('disabled');
+      if(i===q.correct) d.classList.add('correct');
+      else if(i===answered[cur]) d.classList.add('wrong');
+      else d.classList.add('unselected');
+    } else {
+      d.onclick=()=>select(i);
+    }
+    optsEl.appendChild(d);
+  });
+  const fb=document.getElementById('feedback');
+  if(answered[cur]!==undefined){
+    const correct=answered[cur]===q.correct;
+    fb.style.display='block';
+    fb.className='feedback '+(correct?'correct-fb':'wrong-fb');
+    document.getElementById('fb-title').textContent=correct?'Correcto':'Incorrecto — Respuesta: '+letters[q.correct];
+    document.getElementById('fb-text').textContent=q.why;
+    document.getElementById('btn-next').disabled=false;
+  } else {
+    fb.style.display='none';
+    document.getElementById('btn-next').disabled=true;
+  }
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===7?'Ver resultados':'Siguiente';
+  document.getElementById('score-live').textContent=score+' / 8';
+}
+
+function select(i){
+  if(answered[cur]!==undefined) return;
+  answered[cur]=i;
+  if(i===Qs[cur].correct) score++;
+  render();
+}
+
+function next(){
+  if(cur===7){ showScore(); return; }
+  cur++; render();
+}
+
+function prev(){
+  if(cur>0){ cur--; render(); }
+}
+
+function showScore(){
+  document.getElementById('quiz-area').style.display='none';
+  const ss=document.getElementById('score-screen');
+  ss.style.display='block';
+  document.getElementById('score-num').textContent=score+'/8';
+  const msgs=['Sigue explorando el capítulo — cada relectura abre nuevas capas.','Buen comienzo. Hay ideas que vale la pena revisar con calma.','Muy bien. Estás captando los conceptos centrales del capítulo.','Excelente. Dominas las ideas de esta conversación.'];
+  const mi=score<=2?0:score<=4?1:score<=6?2:3;
+  document.getElementById('score-msg').textContent=msgs[mi];
+  const niveles={};
+  Qs.forEach((q,i)=>{ const n=q.nivel; if(!niveles[n])niveles[n]={total:0,ok:0}; niveles[n].total++; if(answered[i]===q.correct)niveles[n].ok++; });
+  const bars=document.getElementById('score-bars');
+  bars.innerHTML='';
+  Object.entries(niveles).forEach(([n,v])=>{
+    const pct=Math.round(v.ok/v.total*100);
+    bars.innerHTML+=`<div class="score-row"><span style="min-width:160px">${n}</span><div class="score-track"><div class="score-fill" style="width:${pct}%"></div></div><span style="min-width:36px;text-align:right">${v.ok}/${v.total}</span></div>`;
+  });
+}
+
+function restart(){
+  cur=0; score=0; answered=[];
+  document.getElementById('quiz-area').style.display='block';
+  document.getElementById('score-screen').style.display='none';
+  render();
+}
+
+render();
+</script>
