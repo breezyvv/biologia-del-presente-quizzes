@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 2 · Tercer Espacio</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Forum&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --marron: #514236; --teal: #2F5D62; --teal2: #4A6D70;
+    --gold: #C4956A; --cream: #F5F0EB; --cream2: #F0EBE5;
+    --night: #1A232E; --correct: #2F5D62; --wrong: #8B3A3A;
+    --correct-bg: #E8F2F3; --wrong-bg: #F5E8E8;
+  }
+  body { background: var(--cream); font-family: 'Jost', sans-serif; color: var(--night); padding-bottom: 60px; }
+
+  .site-header { background: var(--marron); padding: 22px 40px 18px; display: flex; align-items: center; gap: 16px; }
+  .header-text .header-brand { font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 2px; }
+  .header-text .header-sub  { font-size: 10px; letter-spacing: 0.14em; color: var(--gold); }
+
+  .hero { background: linear-gradient(135deg, #3a2d25 0%, var(--marron) 100%); padding: 44px 40px 36px; position: relative; overflow: hidden; }
+  .hero::after  { content:''; position:absolute; right:-40px; top:-40px; width:200px; height:200px; border-radius:50%; border:1.5px solid rgba(196,149,106,0.12); pointer-events:none; }
+  .hero::before { content:''; position:absolute; right:40px; bottom:-50px; width:120px; height:120px; border-radius:50%; border:1px solid rgba(196,149,106,0.07); pointer-events:none; }
+  .cap-badge { display:inline-block; font-size:10px; font-weight:600; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); border:1px solid rgba(196,149,106,0.4); padding:4px 14px; border-radius:20px; margin-bottom:14px; }
+  .hero-title    { font-size:26px; font-weight:700; color:#fff; line-height:1.2; margin-bottom:8px; max-width:460px; }
+  .hero-subtitle { font-family:'Forum',serif; font-size:14px; color:rgba(255,255,255,0.5); font-style:italic; margin-bottom:24px; }
+  .hero-meta { display:flex; gap:20px; flex-wrap:wrap; }
+  .meta-pill { font-size:11px; font-weight:500; color:rgba(255,255,255,0.65); display:flex; align-items:center; gap:6px; }
+  .meta-dot  { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+
+  .progress-bar-wrap { background:var(--cream2); padding:14px 40px; border-bottom:1px solid #e0d8d0; position:sticky; top:0; z-index:10; }
+  .progress-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+  .progress-label { font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--teal2); }
+  .progress-count { font-size:11px; font-weight:500; color:var(--marron); }
+  .progress-track { height:4px; background:#ddd8d2; border-radius:4px; overflow:hidden; }
+  .progress-fill  { height:100%; background:linear-gradient(90deg,var(--teal),var(--gold)); border-radius:4px; transition:width 0.5s ease; width:0%; }
+
+  .main-wrap { max-width:700px; margin:0 auto; padding:40px 24px 0; }
+
+  .q-card { background:#fff; border-radius:4px; overflow:hidden; box-shadow:0 2px 20px rgba(81,66,54,0.09); display:none; animation:fadeUp 0.35s ease; }
+  .q-card.active { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-card-header { background:var(--teal); padding:20px 28px 18px; }
+  .q-type-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .q-number { font-size:10px; font-weight:700; letter-spacing:0.18em; color:rgba(255,255,255,0.45); text-transform:uppercase; }
+  .q-type-badge { font-size:9px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; padding:3px 10px; border-radius:12px; }
+  .badge-comprension { background:rgba(196,149,106,0.3); color:var(--gold); }
+  .badge-inferencia  { background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.85); }
+  .badge-vocabulario { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.65); }
+  .q-text { font-family:'Forum',serif; font-size:17px; color:#fff; line-height:1.6; }
+  .q-quote { background:rgba(0,0,0,0.18); border-left:3px solid var(--gold); padding:14px 18px; margin:14px 0 0; border-radius:0 3px 3px 0; }
+  .q-quote p { font-family:'Forum',serif; font-size:13px; color:rgba(255,255,255,0.75); line-height:1.65; font-style:italic; }
+
+  .q-card-body { padding:24px 28px 28px; }
+  .options-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
+  .option-btn { width:100%; display:flex; align-items:flex-start; gap:14px; background:var(--cream); border:1.5px solid #ddd8d0; border-radius:4px; padding:14px 18px; cursor:pointer; text-align:left; transition:all 0.2s; font-family:'Jost',sans-serif; }
+  .option-btn:hover:not(:disabled) { border-color:var(--teal2); background:#edf5f6; }
+  .option-letter { flex-shrink:0; width:26px; height:26px; border-radius:50%; background:#e0dbd5; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--marron); transition:all 0.2s; margin-top:1px; }
+  .option-text { font-size:14px; color:var(--night); line-height:1.55; }
+  .option-btn.correct { border-color:var(--correct); background:var(--correct-bg); }
+  .option-btn.correct .option-letter { background:var(--correct); color:#fff; }
+  .option-btn.wrong   { border-color:var(--wrong);   background:var(--wrong-bg); }
+  .option-btn.wrong   .option-letter { background:var(--wrong);   color:#fff; }
+  .option-btn:disabled { cursor:default; }
+
+  .feedback-box { display:none; margin-top:20px; padding:16px 20px; border-radius:4px; animation:fadeUp 0.3s ease; }
+  .feedback-box.correct { background:var(--correct-bg); border-left:3px solid var(--correct); display:block; }
+  .feedback-box.wrong   { background:var(--wrong-bg);   border-left:3px solid var(--wrong);   display:block; }
+  .feedback-label { font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:6px; }
+  .feedback-box.correct .feedback-label { color:var(--correct); }
+  .feedback-box.wrong   .feedback-label { color:var(--wrong); }
+  .feedback-text { font-family:'Forum',serif; font-size:14px; color:var(--night); line-height:1.65; }
+
+  .nav-row { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:20px; border-top:1px solid #e8e0d8; }
+  .btn-nav { font-family:'Jost',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; padding:10px 24px; border-radius:30px; border:none; cursor:pointer; transition:all 0.2s; }
+  .btn-next { background:var(--marron); color:#fff; opacity:0; pointer-events:none; transition:opacity 0.3s,background 0.2s; }
+  .btn-next.visible { opacity:1; pointer-events:all; }
+  .btn-next:hover { background:var(--teal); }
+  .btn-skip { background:transparent; color:var(--teal2); border:1px solid var(--teal2); font-size:11px; }
+  .btn-skip:hover { background:var(--cream2); }
+
+  .results-card { display:none; background:#fff; border-radius:4px; overflow:hidden; box-shadow:0 2px 20px rgba(81,66,54,0.09); animation:fadeUp 0.4s ease; }
+  .results-card.active { display:block; }
+  .results-header { background:var(--marron); padding:36px 40px; text-align:center; }
+  .results-score-ring { width:110px; height:110px; border-radius:50%; border:3px solid rgba(196,149,106,0.25); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 20px; position:relative; }
+  .results-score-number { font-size:36px; font-weight:700; color:var(--gold); line-height:1; }
+  .results-score-total  { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
+  .results-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:6px; }
+  .results-msg   { font-family:'Forum',serif; font-size:14px; color:rgba(255,255,255,0.55); font-style:italic; }
+  .results-body  { padding:32px 40px; }
+  .results-breakdown { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
+  .breakdown-item { background:var(--cream); border-radius:4px; padding:16px; text-align:center; }
+  .breakdown-num   { font-size:24px; font-weight:700; color:var(--teal); margin-bottom:4px; }
+  .breakdown-label { font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--marron); opacity:0.7; }
+  .results-message { font-family:'Forum',serif; font-size:15px; color:var(--night); line-height:1.7; text-align:center; padding:20px 24px; background:var(--cream2); border-left:3px solid var(--gold); border-radius:0 4px 4px 0; margin-bottom:24px; }
+  .btn-restart { display:block; width:100%; font-family:'Jost',sans-serif; font-size:12px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; padding:14px; border-radius:4px; border:none; background:var(--marron); color:#fff; cursor:pointer; transition:background 0.2s; }
+  .btn-restart:hover { background:var(--teal); }
+  .score-ring-svg { position:absolute; top:-3px; left:-3px; width:116px; height:116px; transform:rotate(-90deg); }
+  .score-ring-circle { fill:none; stroke:var(--gold); stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="6" r="2.5" fill="#C4956A" opacity="0.9"/>
+    <path d="M18 9 C14 13 9 16 9 22 C9 28 13 32 18 32 C23 32 27 28 27 22 C27 16 22 13 18 9Z" stroke="#C4956A" stroke-width="1.2" fill="none" opacity="0.8"/>
+    <path d="M13 19 C13 19 15 21 18 21 C21 21 23 19 23 19" stroke="#C4956A" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+  <div class="header-text">
+    <div class="header-brand">Spring Up · Atelier de Vida</div>
+    <div class="header-sub">Tercer Espacio · La Biología del Presente</div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="cap-badge">· Conversación 2 ·</div>
+  <h1 class="hero-title">El melocotón que quiere ser manzana</h1>
+  <p class="hero-subtitle">La personalidad y la desaparición de tu universo</p>
+  <div class="hero-meta">
+    <span class="meta-pill"><span class="meta-dot"></span>6 preguntas</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Comprensión · Inferencia · Vocabulario</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Responde a tu ritmo</span>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-row">
+    <span class="progress-label">Progreso</span>
+    <span class="progress-count" id="prog-count">0 de 6</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- Q1 -->
+  <div class="q-card active" id="q1">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 1 / 6</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Cuál es la diferencia entre «gusto» y «sabor» según el capítulo?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. El capítulo no distingue gusto y sabor por el tipo de alimento sino por la naturaleza de la experiencia: el gusto es información sensorial pura; el sabor es la construcción mental que el cerebro hace sobre esa información."><span class="option-letter">A</span><span class="option-text">El gusto es para alimentos sólidos y el sabor para líquidos como el vino</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. Aunque el olfato contribuye al sabor, el capítulo define la diferencia de otra manera: el gusto es la señal sensorial básica; el sabor es la experiencia mental compleja construida sobre ella — incluyendo recuerdos, expectativas, imagen y sonido."><span class="option-letter">B</span><span class="option-text">El gusto involucra la lengua y el sabor involucra exclusivamente el olfato</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q1')" data-feedback="Exacto. El capítulo lo define con precisión: «El gusto tiene que ver con moléculas dulces, saladas, amargas, agrias o umami, con genes y receptores sensoriales. En cambio, el sabor es una experiencia mental que implica el sonido que hacemos al masticar, el aroma, los recuerdos de experiencias pasadas, las expectativas futuras, información visual y también el gusto.»"><span class="option-letter">C</span><span class="option-text">El gusto es información sensorial pura de la lengua; el sabor es una construcción mental que añade recuerdos, expectativas, aroma e imagen</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. Son conceptos distintos — no es que uno sea más intenso que el otro. El gusto es el dato sensorial; el sabor es la experiencia mental que el cerebro fabrica sobre ese dato."><span class="option-letter">D</span><span class="option-text">Son sinónimos — el sabor es simplemente un gusto más intenso</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q1"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q2')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q1" onclick="goTo('q2')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 2 / 6</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">En el experimento mental de la realidad virtual, ¿qué sabor experimentaría la persona que cree estar comiendo manzana pero en realidad muerde un melocotón?</p>
+      <div class="q-quote">
+        <p>«La gracia del experimento es que aunque las gafas de realidad virtual te hagan creer que estás mordiendo un trozo de manzana, en realidad, estás mordiendo un melocotón. La pregunta es: ¿cuál de los dos sabores experimentarás?»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. Si experimentara solo manzana, el experimento estaría demostrando que la mente domina completamente los sentidos físicos — lo que iría demasiado lejos. El capítulo plantea la pregunta precisamente porque la respuesta no es obvia y abre el debate sobre cuánto peso tiene la construcción mental."><span class="option-letter">A</span><span class="option-text">Solo a manzana — la mente anula completamente la información sensorial real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. Si solo supiera a melocotón, el experimento demostraría que la construcción mental no tiene ningún efecto — y el capítulo estaría proponiendo lo contrario."><span class="option-letter">B</span><span class="option-text">Solo a melocotón — los sentidos físicos siempre prevalecen sobre la creencia mental</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q2')" data-feedback="Exacto. Sergi responde espontáneamente: «Imagino que sabría a melocotón» — y eso es la clave. La pregunta del experimento no tiene una respuesta cerrada, sino que abre la investigación: ¿cuánto peso tienen los recuerdos, las expectativas y la información visual sobre la experiencia sensorial directa? El capítulo usa esta tensión para mostrar que el sabor es una construcción donde lo mental y lo físico se mezclan de forma no predecible."><span class="option-letter">C</span><span class="option-text">Probablemente a melocotón — porque los sentidos físicos aportan información real, aunque la mente construya encima de ella con recuerdos y expectativas</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. Una mezcla exactamente equilibrada entre los dos sabores no es lo que el capítulo propone — la respuesta depende de cuántos sentidos se falsifiquen y del peso relativo de los recuerdos, que varía por persona y contexto."><span class="option-letter">D</span><span class="option-text">Una mezcla exactamente equilibrada de ambos sabores simultáneamente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q2"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q3')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q2" onclick="goTo('q3')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 3 / 6</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Qué dice el capítulo que ocurre cuando vivir el presente puro se siente como «desaparecer»?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. Que sea incómodo no es la razón profunda. El capítulo lo explica en términos de supervivencia: para la mentalidad superviviente, desaparecer es equivalente a morir — y por eso el mecanismo de anticipación se activa para evitarlo."><span class="option-letter">A</span><span class="option-text">Que la experiencia es simplemente incómoda y requiere adaptación gradual</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q3')" data-feedback="Exacto. El capítulo lo dice con claridad: vivir el presente puro — sin el filtro del yo conocido — se siente como desaparecer. Y para la mentalidad superviviente, desaparecer es morir. Por eso el cerebro anticipa constantemente: para mantener en pie la identidad conocida y no perder el «yo» que reconoce como sí mismo. La paradoja es que al anticipar, nos perdemos lo único que existe: este instante."><span class="option-letter">B</span><span class="option-text">Que la mentalidad superviviente lo interpreta como una amenaza de muerte — y activa la anticipación para proteger la identidad conocida, perdiéndose el instante real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. El capítulo no propone que desaparecer sea un estado espiritual avanzado al que aspirar con práctica. La desaparición que describe Sergi Torres es el reconocimiento de que la personalidad no es lo que uno es esencialmente — no un logro espiritual."><span class="option-letter">C</span><span class="option-text">Que es una señal de avance espiritual que solo los practicantes avanzados pueden tolerar</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. El capítulo no propone la anticipación como una habilidad a desarrollar. Al contrario — la anticipación es el mecanismo que impide vivir el presente real, porque la mente llega antes que la experiencia y la define antes de que ocurra."><span class="option-letter">D</span><span class="option-text">Que hay que desarrollar la habilidad de anticipar mejor para prepararse antes de estar en presencia</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q3"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q4')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q3" onclick="goTo('q4')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 4 / 6</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Qué es la personalidad según el Capítulo 2?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. El capítulo es explícito en lo contrario: «La personalidad no es una cualidad de las personas». Definirla como el conjunto de cualidades esenciales es exactamente el paradigma que el capítulo desmonta."><span class="option-letter">A</span><span class="option-text">El conjunto de cualidades esenciales y permanentes que definen a una persona</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. La personalidad no se forma exclusivamente por el entorno social y cultural — el capítulo la describe como un mecanismo neurológico de supervivencia más profundo que el condicionamiento cultural."><span class="option-letter">B</span><span class="option-text">El resultado del entorno social y cultural en el que una persona crece</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q4')" data-feedback="Exacto. El capítulo lo dice sin rodeos: «La personalidad no es una cualidad de las personas, sino un motivo fabricado artificialmente con tecnología mental para no desaparecer.» Es el mecanismo que el cerebro superviviente construye para mantener un yo estable, predecible y continuo — no porque sea lo que uno es, sino para proteger algo que cree que es."><span class="option-letter">C</span><span class="option-text">Un motivo fabricado con tecnología mental para no desaparecer — no una cualidad esencial sino un mecanismo de supervivencia</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. Aunque la genética influye en ciertos rasgos de temperamento, el capítulo no define la personalidad como determinación genética. La define como una construcción mental — deliberada aunque inconsciente — para sostener la identidad del yo."><span class="option-letter">D</span><span class="option-text">La expresión directa de la carga genética de cada individuo</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q4"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q5')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q4" onclick="goTo('q5')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 5 / 6</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El capítulo dice que «no nos gustan las cosas — pensamos que nos gustan». ¿Qué implicaría esto para algo que llevas años diciéndote que no te gusta?</p>
+      <div class="q-quote">
+        <p>«No es que no te guste el dulce — es que piensas que no te gusta. Y ese pensamiento, no la experiencia, es el que toma decisiones, genera rechazo y termina definiendo quién crees ser.»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El capítulo no propone que todo lo que no nos gusta sea falso ni que debamos forzarnos a apreciarlo. La distinción es más sutil: hay una diferencia entre no haberlo experimentado directamente en el presente y haber decidido desde un archivo de recuerdos que no nos gusta."><span class="option-letter">A</span><span class="option-text">Que en realidad sí nos gusta — solo nos hemos equivocado todos estos años</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El capítulo no propone ignorar las propias preferencias. Propone algo más preciso: distinguir entre una experiencia directa en el presente y un pensamiento sobre esa experiencia almacenado en el pasado — y reconocer que el segundo puede estar dirigiendo la vida sin que lo sepamos."><span class="option-letter">B</span><span class="option-text">Que hay que ignorar las propias preferencias para vivir más en el presente</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q5')" data-feedback="Exacto. Si lo que dirige la vida no es la experiencia directa sino el pensamiento sobre la experiencia — un archivo del pasado — entonces es posible que nunca hayamos vuelto a probar eso desde el presente. La pregunta que el capítulo abre no es «¿te gusta o no?» sino «¿lo estás experimentando ahora o estás usando un recuerdo para decidir?» Esa distinción pequeña tiene consecuencias enormes en cómo uno vive."><span class="option-letter">C</span><span class="option-text">Que quizás estás usando un recuerdo del pasado — no la experiencia directa del presente — para tomar una decisión que se repite sin cuestionarse</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El capítulo no propone que los gustos sean completamente arbitrarios ni que cambien sin razón. Propone que hay una diferencia importante entre la experiencia sensorial directa y el pensamiento que la interpreta — y que a menudo vivimos desde el segundo sin notarlo."><span class="option-letter">D</span><span class="option-text">Que los gustos son completamente arbitrarios y cambian solos con el tiempo sin que podamos hacer nada</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q5"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q6')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q5" onclick="goTo('q6')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 6 / 6</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El título del capítulo es «El melocotón que quiere ser manzana». ¿A qué hace referencia esa metáfora en relación con la personalidad?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. El capítulo no habla de admirar o envidiar a otros. La metáfora apunta a algo más profundo: la relación de la personalidad con su propia naturaleza, no con la de otra persona."><span class="option-letter">A</span><span class="option-text">Que las personas tendemos a admirar y querer imitar a quienes nos parecen más exitosos</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q6')" data-feedback="Exacto. El melocotón que quiere ser manzana es la personalidad que no reconoce lo que es esencialmente — y que, al intentar ser lo que no es, pierde el acceso a su propia naturaleza. El capítulo propone que la personalidad es el mecanismo que construimos para no desaparecer, pero que confundirla con lo que somos esencialmente nos aleja de vivir desde lo que realmente somos. No es un problema de autoestima — es un problema de identidad mal atribuida."><span class="option-letter">B</span><span class="option-text">Que la personalidad intenta ser algo distinto de lo que es esencialmente — y al hacerlo pierde el acceso a su propia naturaleza real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. El capítulo no propone que debamos aceptar pasivamente lo que somos sin cuestionarlo. Propone algo más activo: reconocer que la personalidad es una construcción — no la esencia — y desde ese reconocimiento tener acceso a algo más profundo."><span class="option-letter">C</span><span class="option-text">Que debemos aceptar pasivamente lo que somos sin intentar cambiar ni crecer</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. La comparación social puede ser una manifestación del problema, pero no es el núcleo de la metáfora. El melocotón no quiere ser manzana porque compara — quiere serlo porque no reconoce lo que es esencialmente."><span class="option-letter">D</span><span class="option-text">Que vivimos comparándonos constantemente con los demás en lugar de apreciar lo que tenemos</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q6"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="showResults()">Ver resultados</button>
+        <button class="btn-nav btn-next" id="next-q6" onclick="showResults()">Ver mis resultados ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="results">
+    <div class="results-header">
+      <div class="results-score-ring">
+        <svg class="score-ring-svg" viewBox="0 0 116 116">
+          <circle cx="58" cy="58" r="52" class="score-ring-circle" id="ring-circle" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="results-score-number" id="score-num">0</div>
+        <div class="results-score-total">de 6</div>
+      </div>
+      <div class="results-title" id="results-title">—</div>
+      <div class="results-msg" id="results-msg">—</div>
+    </div>
+    <div class="results-body">
+      <div class="results-breakdown">
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-correct">0</div><div class="breakdown-label">Correctas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-wrong">0</div><div class="breakdown-label">Incorrectas</div></div>
+        <div class="breakdown-item"><div class="breakdown-num" id="bd-skipped">0</div><div class="breakdown-label">Omitidas</div></div>
+      </div>
+      <div class="results-message" id="results-message">—</div>
+      <button class="btn-restart" onclick="restart()">Volver a intentar el quiz</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL = 6;
+let score = 0, answered = 0, skipped = 0, wrong = 0, current = 1;
+
+function answer(btn, isCorrect, qId) {
+  const card = document.getElementById(qId);
+  card.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('onclick').includes('true,')) b.classList.add('correct');
+  });
+  btn.classList.remove('correct');
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (isCorrect) score++; else wrong++;
+  answered++;
+  const fb = document.getElementById('fb-' + qId);
+  fb.classList.add(isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = `<div class="feedback-label">${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}</div><p class="feedback-text">${btn.dataset.feedback}</p>`;
+  const nb = document.getElementById('next-' + qId);
+  if (nb) nb.classList.add('visible');
+  updateProgress();
+}
+
+function skipTo(nextId) { skipped++; goTo(nextId); }
+
+function goTo(nextId) {
+  document.getElementById('q' + current).classList.remove('active');
+  current++;
+  const next = document.getElementById(nextId);
+  if (next) { next.classList.add('active'); next.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = answered + skipped;
+  document.getElementById('prog-fill').style.width = (done / TOTAL * 100) + '%';
+  document.getElementById('prog-count').textContent = done + ' de ' + TOTAL;
+}
+
+function showResults() {
+  document.getElementById('q6').classList.remove('active');
+  const res = document.getElementById('results');
+  res.classList.add('active');
+  res.scrollIntoView({ behavior:'smooth', block:'start' });
+
+  let s = 0;
+  const el = document.getElementById('score-num');
+  const iv = setInterval(() => { if (s >= score) { clearInterval(iv); return; } el.textContent = ++s; }, 100);
+  setTimeout(() => { document.getElementById('ring-circle').style.strokeDashoffset = 326.7 - (score/TOTAL)*326.7; }, 200);
+
+  document.getElementById('bd-correct').textContent = score;
+  document.getElementById('bd-wrong').textContent = wrong;
+  document.getElementById('bd-skipped').textContent = TOTAL - answered;
+
+  const pct = score / TOTAL;
+  let title, msg, message;
+  if (pct >= 0.85) {
+    title = '¡El melocotón que se reconoce a sí mismo!';
+    msg = 'Comprensión sólida del capítulo — listo para el taller.';
+    message = 'Captaste las distinciones más finas del capítulo: gusto vs. sabor como modelo de construcción mental, la personalidad como mecanismo de supervivencia y la anticipación como huida del presente. El taller será el espacio para llevar estas ideas a tu experiencia directa.';
+  } else if (pct >= 0.65) {
+    title = 'Bien encaminado';
+    msg = 'Las ideas centrales están — hay matices por afinar.';
+    message = 'Tienes una comprensión sólida de los conceptos principales. Vale la pena revisar la distinción entre experiencia directa y pensamiento sobre la experiencia — esa es la llave de todo el capítulo. El debate en el taller te ayudará a aterrizarla en tu cotidianidad.';
+  } else {
+    title = 'Una posibilidad abierta';
+    msg = 'El capítulo tiene más profundidad de lo que parece.';
+    message = 'Los conceptos del Capítulo 2 son contraintuitivos porque cuestionan algo que damos por obvio: que lo que sentimos es la realidad. Releer la Conversación 2 antes del taller, con esta experiencia del quiz en mente, te dará mucho más material para la conversación grupal.';
+  }
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-msg').textContent = msg;
+  document.getElementById('results-message').textContent = message;
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-count').textContent = TOTAL + ' de ' + TOTAL;
+}
+
+function restart() {
+  score = 0; answered = 0; skipped = 0; wrong = 0; current = 1;
+  document.querySelectorAll('.q-card').forEach(c => {
+    c.classList.remove('active');
+    c.querySelectorAll('.option-btn').forEach(b => { b.disabled=false; b.classList.remove('correct','wrong'); });
+    c.querySelectorAll('.feedback-box').forEach(f => { f.classList.remove('correct','wrong'); f.innerHTML=''; });
+    c.querySelectorAll('.btn-next').forEach(n => n.classList.remove('visible'));
+  });
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('q1').classList.add('active');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-count').textContent = '0 de 6';
+  document.getElementById('ring-circle').style.strokeDashoffset = '326.7';
+  document.getElementById('score-num').textContent = '0';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
+</body>
+</html>
