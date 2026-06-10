@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 9 · Tercer Espacio</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Forum&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --marron:    #514236;
+    --teal:      #2F5D62;
+    --teal2:     #4A6D70;
+    --gold:      #C4956A;
+    --cream:     #F5F0EB;
+    --cream2:    #F0EBE5;
+    --night:     #1A232E;
+    --white:     #FFFFFF;
+    --correct:   #2F5D62;
+    --wrong:     #8B3A3A;
+    --correct-bg:#E8F2F3;
+    --wrong-bg:  #F5E8E8;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'Jost', sans-serif;
+    color: var(--night);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--marron);
+    padding: 22px 40px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-svg { flex-shrink: 0; }
+  .header-text { flex: 1; }
+  .header-brand {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 2px;
+  }
+  .header-sub {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--marron) 0%, #3a2d25 100%);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(196,149,106,0.15);
+    pointer-events: none;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: 40px; bottom: -60px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    border: 1px solid rgba(196,149,106,0.08);
+    pointer-events: none;
+  }
+  .cap-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(196,149,106,0.4);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    max-width: 480px;
+  }
+  .hero-subtitle {
+    font-family: 'Forum', serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: var(--cream2);
+    padding: 16px 40px;
+    border-bottom: 1px solid #e0d8d0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal2);
+  }
+  .progress-count {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--marron);
+  }
+  .progress-track {
+    height: 4px;
+    background: #ddd8d2;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── MAIN ── */
+  .main-wrap {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(81,66,54,0.09);
+    margin-bottom: 0;
+    display: none;
+    animation: fadeUp 0.35s ease;
+  }
+  .q-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card-header {
+    background: var(--teal);
+    padding: 20px 28px 16px;
+  }
+  .q-type-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .q-number {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+  }
+  .q-type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .badge-comprension { background: rgba(196,149,106,0.25); color: var(--gold); }
+  .badge-inferencia  { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+  .badge-vocabulario { background: rgba(255,255,255,0.1);  color: rgba(255,255,255,0.7); }
+
+  .q-text {
+    font-family: 'Forum', serif;
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.6;
+  }
+
+  /* Quote inside question */
+  .q-quote {
+    background: rgba(0,0,0,0.18);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    margin: 14px 0 0;
+    border-radius: 0 3px 3px 0;
+  }
+  .q-quote p {
+    font-family: 'Forum', serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  .q-card-body { padding: 24px 28px 28px; }
+
+  /* ── OPTIONS ── */
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--cream);
+    border: 1.5px solid #ddd8d0;
+    border-radius: 4px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    font-family: 'Jost', sans-serif;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--teal2);
+    background: #edf5f6;
+  }
+  .option-letter {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #e0dbd5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: var(--marron);
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .option-text {
+    font-size: 14px;
+    color: var(--night);
+    line-height: 1.55;
+  }
+
+  /* states */
+  .option-btn.correct {
+    border-color: var(--correct);
+    background: var(--correct-bg);
+  }
+  .option-btn.correct .option-letter {
+    background: var(--correct);
+    color: #fff;
+  }
+  .option-btn.wrong {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+  }
+  .option-btn.wrong .option-letter {
+    background: var(--wrong);
+    color: #fff;
+  }
+  .option-btn:disabled { cursor: default; }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    display: none;
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 4px;
+    animation: fadeUp 0.3s ease;
+  }
+  .feedback-box.correct {
+    background: var(--correct-bg);
+    border-left: 3px solid var(--correct);
+    display: block;
+  }
+  .feedback-box.wrong {
+    background: var(--wrong-bg);
+    border-left: 3px solid var(--wrong);
+    display: block;
+  }
+  .feedback-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .feedback-box.correct .feedback-label { color: var(--correct); }
+  .feedback-box.wrong  .feedback-label { color: var(--wrong); }
+  .feedback-text {
+    font-family: 'Forum', serif;
+    font-size: 14px;
+    color: var(--night);
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e8e0d8;
+  }
+  .btn-nav {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-next {
+    background: var(--marron);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, background 0.2s;
+  }
+  .btn-next.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .btn-next:hover { background: var(--teal); }
+  .btn-skip {
+    background: transparent;
+    color: var(--teal2);
+    border: 1px solid var(--teal2);
+    font-size: 11px;
+  }
+  .btn-skip:hover { background: var(--cream2); }
+
+  /* ── RESULTS ── */
+  .results-card {
+    display: none;
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(81,66,54,0.09);
+    animation: fadeUp 0.4s ease;
+  }
+  .results-card.active { display: block; }
+  .results-header {
+    background: var(--marron);
+    padding: 36px 40px;
+    text-align: center;
+  }
+  .results-score-ring {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 3px solid rgba(196,149,106,0.3);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .results-score-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .results-score-total {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+  }
+  .results-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .results-msg {
+    font-family: 'Forum', serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    font-style: italic;
+  }
+  .results-body { padding: 32px 40px; }
+  .results-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .breakdown-item {
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+  }
+  .breakdown-num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 4px;
+  }
+  .breakdown-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--marron);
+    opacity: 0.7;
+  }
+  .results-message {
+    font-family: 'Forum', serif;
+    font-size: 15px;
+    color: var(--night);
+    line-height: 1.7;
+    text-align: center;
+    padding: 20px 24px;
+    background: var(--cream2);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 24px;
+  }
+  .btn-restart {
+    display: block;
+    width: 100%;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 14px;
+    border-radius: 4px;
+    border: none;
+    background: var(--marron);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-restart:hover { background: var(--teal); }
+
+  /* score ring SVG */
+  .score-ring-svg {
+    position: absolute;
+    top: -3px; left: -3px;
+    width: 116px; height: 116px;
+    transform: rotate(-90deg);
+  }
+  .score-ring-circle {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <svg class="logo-svg" width="34" height="34" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="6" r="2.5" fill="#C4956A" opacity="0.9"/>
+    <path d="M18 9 C14 13 9 16 9 22 C9 28 13 32 18 32 C23 32 27 28 27 22 C27 16 22 13 18 9Z" stroke="#C4956A" stroke-width="1.2" fill="none" opacity="0.8"/>
+    <path d="M13 19 C13 19 15 21 18 21 C21 21 23 19 23 19" stroke="#C4956A" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+  <div class="header-text">
+    <div class="header-brand">Spring Up · Atelier de Vida</div>
+    <div class="header-sub">Tercer Espacio · La Biología del Presente</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="cap-badge">· Conversación 9 ·</div>
+  <h1 class="hero-title">Investigadores del Presente</h1>
+  <p class="hero-subtitle">La confianza y la honestidad, grandes promotores de la presencia</p>
+  <div class="hero-meta">
+    <span class="meta-pill"><span class="meta-dot"></span>12 preguntas</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Comprensión · Inferencia · Vocabulario</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Responde a tu ritmo</span>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-row">
+    <span class="progress-label">Progreso</span>
+    <span class="progress-count" id="prog-count">0 de 12</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="prog-fill"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- Q1 -->
+  <div class="q-card active" id="q1">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 1 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Qué es la «remisión espontánea» según el capítulo?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="La remisión espontánea no es el efecto placebo — el capítulo lo distingue explícitamente: «El efecto placebo puede producir cambios en los síntomas, pero estamos hablando de curar un cáncer o un VIH, algo que le queda bastante grande al efecto placebo»."><span class="option-letter">A</span><span class="option-text">La mejoría de síntomas producida por el efecto placebo tras un tratamiento</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q1')" data-feedback="Exacto. El libro la define como: «Una enfermedad diagnosticada rigurosamente por un especialista que desaparece de la noche a la mañana sin que la persona haya tomado un tratamiento eficaz conocido.»"><span class="option-letter">B</span><span class="option-text">La desaparición de una enfermedad diagnosticada sin tratamiento eficaz conocido</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. El capítulo aclara expresamente: «La remisión espontánea tampoco se asocia a un fallo en el diagnóstico»."><span class="option-letter">C</span><span class="option-text">Un error de diagnóstico médico que hace creer que la enfermedad desapareció</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. La remisión espontánea es un fenómeno clínico registrado científicamente, no una práctica espiritual. El capítulo la ubica dentro de la ciencia médica, aunque sea «una rama incomprendida»."><span class="option-letter">D</span><span class="option-text">Una práctica espiritual que revierte enfermedades crónicas mediante meditación</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q1"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q2')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q1" onclick="goTo('q2')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 2 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Cuáles son las tres características que definen a un investigador del presente según el texto?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No exactamente. Tener formación académica no es un requisito. El capítulo es explícito: «Es una persona normal y corriente»."><span class="option-letter">A</span><span class="option-text">Tiene formación científica, sigue protocolos médicos y aplica técnicas de mindfulness</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="Parcialmente correcto, pero incompleto. «Cuestionar todo» no aparece como característica — la clave es no dejarse guiar por ideas que impidan avanzar, lo cual es más específico y más sutil."><span class="option-letter">B</span><span class="option-text">Cuestiona todo, medita diariamente y tiene experiencias de remisión espontánea</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q2')" data-feedback="Exacto. Las tres características textuales son: (1) consciente de cómo funciona su mente y organismo, (2) no se deja guiar por ideas o creencias que le impidan aprender, (3) no tiene miedo a equivocarse y aplica sus descubrimientos a su vida diaria."><span class="option-letter">C</span><span class="option-text">Conoce su mente y organismo · no se guía por creencias que le impidan avanzar · no teme equivocarse y aplica lo que descubre</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. El capítulo no menciona ni la apertura espiritual ni la búsqueda de la verdad absoluta como características del investigador del presente. Las características son más concretas y menos abstractas."><span class="option-letter">D</span><span class="option-text">Tiene apertura espiritual, busca la verdad absoluta y vive en coherencia con sus valores</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q2"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q3')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q2" onclick="goTo('q3')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 3 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Dónde se ubica el «detector de honestidad» en el cerebro y qué lo activa?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. La amígdala está relacionada con el miedo y la confianza — pero no es el detector de honestidad. El capítulo distingue claramente estas estructuras."><span class="option-letter">A</span><span class="option-text">En la amígdala, y se activa cuando mentimos a otras personas en voz alta</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. El hipocampo está vinculado a la memoria, no a la honestidad. El capítulo menciona el hipocampo al hablar de emociones enredadas, no del detector de honestidad."><span class="option-letter">B</span><span class="option-text">En el hipocampo, y se activa cuando recordamos algo con inexactitud</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q3')" data-feedback="Correcto. El libro dice: «Cada persona cuenta con un detector de honestidad en el corazón del cerebro — concretamente en la corteza cingulada anterior —, una especie de interruptor que se activa al usar un pensamiento deshonesto.» No hace falta verbalizarlo."><span class="option-letter">C</span><span class="option-text">En la corteza cingulada anterior, y se activa al usar un pensamiento deshonesto — aunque no lo verbalizemos</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. La corteza prefrontal está asociada a funciones ejecutivas en el modelo de biología de la supervivencia — no al detector de honestidad."><span class="option-letter">D</span><span class="option-text">En la corteza prefrontal, y se activa cuando tomamos una decisión consciente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q3"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q4')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q3" onclick="goTo('q4')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 4 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">Según el capítulo, ¿qué significa que «la honestidad es un acto de empatía con uno mismo»?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. Esa es la visión del paradigma antiguo de la honestidad — hacia los demás, como virtud moral. El capítulo quiebra exactamente esa comprensión."><span class="option-letter">A</span><span class="option-text">Que ser honesto con los demás nos hace sentir bien con nosotros mismos</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q4')" data-feedback="Exacto. El capítulo dice: «La neurociencia nos permite entender que la honestidad no tiene nada que ver con decir mentiras a los demás. La honestidad es un acto de empatía con uno mismo.» Es hacia adentro, no hacia afuera."><span class="option-letter">B</span><span class="option-text">Que la honestidad no es una virtud hacia otros sino la capacidad de ver el propio mundo interior sin huir de él</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. La auto-compasión y perdonarse los errores son conceptos distintos. El capítulo habla de ver los propios pensamientos tal como son — incluso los deshonestos — sin distorsionarlos."><span class="option-letter">C</span><span class="option-text">Que debemos perdonarnos nuestros errores y practicar la auto-compasión</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. Aunque la honestidad biológica tiene efectos en la salud, el capítulo no la define como una técnica terapéutica sino como una función neurológica básica del organismo."><span class="option-letter">D</span><span class="option-text">Que la honestidad es una técnica terapéutica que reduce el cortisol y mejora la salud</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q4"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q5')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q4" onclick="goTo('q5')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 5 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Por qué el pensamiento «yo soy yo y solo yo» es considerado el «más limitante de todos» en el capítulo?</p>
+      <div class="q-quote">
+        <p>«Mirar la existencia humana de esta manera hace que los límites de nuestras creencias no sean investigados. Al contrario. Se usan para dar forma a una manera personal de utilizar el cuerpo, la cual, a su vez, corrobora dichas creencias.»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El capítulo no habla de individualismo social ni de falta de altruismo. El problema es más profundo: tiene que ver con la estructura de la identidad y la percepción de la realidad."><span class="option-letter">A</span><span class="option-text">Porque genera individualismo social y hace que la persona se despreocupe por los demás</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="Parcialmente relacionado, pero no es la razón central del capítulo. La autoestima baja es una consecuencia posible, no la definición del problema."><span class="option-letter">B</span><span class="option-text">Porque produce baja autoestima al compararse constantemente con los demás</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q5')" data-feedback="Correcto. Al confirmar esa creencia con la percepción del cuerpo, se construye una «falsa realidad» que excluye la consciencia transpersonal. El cuerpo se vuelve el único espejo de identidad y deja afuera todo lo que no encaja en esa imagen limitada."><span class="option-letter">C</span><span class="option-text">Porque cuando el cuerpo confirma esa creencia, construye una falsa realidad que excluye la consciencia transpersonal y desvincula al ser humano de la vida</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El capítulo no dice que este pensamiento sea peligroso por dañar al cuerpo físicamente de forma directa. El daño es de orden cognitivo y existencial."><span class="option-letter">D</span><span class="option-text">Porque activa la biología de la supervivencia y daña el sistema inmune a largo plazo</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q5"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q6')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q5" onclick="goTo('q6')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 6 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Cuáles son los «máximos promotores» de la red neuronal por defecto y de los pensamientos esenciales?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. La meditación y el ejercicio pueden facilitar estados de presencia, pero el capítulo no los nombra como los máximos promotores de la red neuronal por defecto."><span class="option-letter">A</span><span class="option-text">La meditación y el ejercicio físico regular</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. El agradecimiento y la creatividad son ejemplos de pensamientos esenciales, no los promotores de la red que permite acceder a ellos."><span class="option-letter">B</span><span class="option-text">El agradecimiento y la creatividad</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q6')" data-feedback="Exacto. El texto dice: «¿Y cuáles son los máximos promotores de la red neuronal por defecto y de los pensamientos esenciales? La confianza y la honestidad.» Son la llave de acceso neurológica."><span class="option-letter">C</span><span class="option-text">La confianza y la honestidad</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. El perdón y el desapego son ejemplos de pensamientos esenciales, al igual que el agradecimiento. No son los promotores de la red."><span class="option-letter">D</span><span class="option-text">El perdón y el desapego</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q6"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q7')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q6" onclick="goTo('q7')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q7">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 7 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">Una persona lleva 20 años «intentando confiar» para dejar de sufrir y encontrar pareja. ¿Qué diría el capítulo sobre esa experiencia?</p>
+      <div class="q-quote">
+        <p>«En ese momento, la mujer comprendió que nunca había confiado realmente en su vida: tan solo había disfrazado el miedo de confianza.»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. El capítulo no dice que la confianza requiera más tiempo o más práctica. El problema no es de esfuerzo sino de estructura: confiar para obtener algo no es confianza."><span class="option-letter">A</span><span class="option-text">Que necesita más práctica y paciencia — la confianza es una habilidad que se desarrolla con el tiempo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q7')" data-feedback="Exacto. El capítulo lo describe con precisión: confiar «para no pasarlo mal» o «para encontrar pareja» es negociar con la vida. Y «la neurociencia nos enseña que confianza y miedo utilizan las mismas redes neuronales — no pueden estar activas al mismo tiempo. O confías, o tienes miedo.» Tan solo ha disfrazado el miedo."><span class="option-letter">B</span><span class="option-text">Que en realidad no ha estado confiando: ha estado disfrazando el miedo de confianza, porque confiar «para obtener algo» es negociar, no confiar</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. El capítulo no sugiere que la confianza sea una condición excepcional reservada para personas con cierta madurez espiritual. De hecho, la presenta como accesible para cualquier «persona normal y corriente»."><span class="option-letter">C</span><span class="option-text">Que la confianza genuina solo es posible una vez que se ha alcanzado cierto nivel de madurez espiritual</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. El capítulo no propone trabajar el miedo como técnica previa a confiar. Propone que la confianza y el miedo no pueden coexistir — no hay una secuencia terapéutica, hay una elección."><span class="option-letter">D</span><span class="option-text">Que primero debe trabajar el miedo mediante terapia y solo entonces podrá confiar genuinamente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q7"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q8')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q7" onclick="goTo('q8')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q8">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 8 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Qué relación neurológica establece el capítulo entre la confianza y el miedo?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. El capítulo dice exactamente lo contrario: son las dos caras de la misma moneda y comparten las mismas redes. La confianza no neutraliza el miedo — lo excluye."><span class="option-letter">A</span><span class="option-text">Son procesos complementarios que se equilibran mutuamente — la confianza neutraliza el miedo de forma gradual</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. No son independientes. Al contrario: comparten mesencéfalo, cuerpo estriado dorsal y amígdala — las mismas estructuras."><span class="option-letter">B</span><span class="option-text">Son procesos completamente independientes que se generan en zonas distintas del cerebro</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q8')" data-feedback="Exacto. El texto es preciso: «La neurociencia nos enseña que la confianza y el miedo utilizan las mismas redes neuronales — mesencéfalo, cuerpo estriado dorsal y amígdala —. Son las dos caras de la misma moneda. Por lo tanto, no pueden estar activas al mismo tiempo. O confías, o tienes miedo. Debes elegir.»"><span class="option-letter">C</span><span class="option-text">Utilizan las mismas redes neuronales y no pueden estar activas al mismo tiempo — son las dos caras de la misma moneda</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. Aunque ambos son estados emocionales, el capítulo hace una distinción neurológica muy específica — no los describe simplemente como «opuestos» sino como compitiendo por el mismo sustrato neuronal."><span class="option-letter">D</span><span class="option-text">Son emociones opuestas que se generan en el mismo hemisferio cerebral pero con distinta intensidad</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q8"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q9')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q8" onclick="goTo('q9')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q9">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 9 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El capítulo dice que para dejar de creer algo basta con «abrirse a una sola posibilidad». ¿Qué diferencia hay entre eso y simplemente pensar positivo?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. Pensar positivo suele implicar esfuerzo consciente para sostener una creencia deseable. El capítulo propone algo diferente: no afirmar algo nuevo sino dejar de cerrarse a una posibilidad, lo cual es un movimiento de apertura, no de afirmación."><span class="option-letter">A</span><span class="option-text">No hay diferencia sustancial — ambos consisten en enfocarse en lo positivo para cambiar el estado mental</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q9')" data-feedback="Exacto. Abrir una posibilidad no requiere creerla ni afirmarla — requiere dejar de cerrarla. El texto dice: «Sabe que cualquier creencia se desvanece cuando experimentas las cosas por ti mismo y que, para experimentarlas, tienes que dejar de creértelas». Es investigación desde la apertura, no afirmación desde la voluntad."><span class="option-letter">B</span><span class="option-text">Abrir una posibilidad no implica creerla ni afirmarla — implica dejar de cerrarla para poder experimentar, lo cual es investigación, no voluntad positiva</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. El capítulo no distingue entre los dos por la intensidad del esfuerzo sino por la dirección: pensar positivo afirma, abrir una posibilidad desbloquea. Son movimientos distintos."><span class="option-letter">C</span><span class="option-text">Pensar positivo requiere más esfuerzo — abrirse a una posibilidad es una versión más suave del mismo proceso</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. El capítulo no invalida el pensamiento positivo como peligroso — simplemente propone algo diferente y más concreto: la apertura a experimentar, no la afirmación de un resultado."><span class="option-letter">D</span><span class="option-text">El pensamiento positivo es contraproducente porque crea expectativas — la apertura a posibilidades las evita</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q9"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q10')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q9" onclick="goTo('q10')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q10">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 10 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">Si los pensamientos esenciales son «propiedad de El Presente S.A.» y no se pueden trasladar a otro instante sin convertirse en pensaciones, ¿qué implica esto para la manera de tomar decisiones importantes?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. El capítulo no propone que las decisiones sean espontáneas o impulsivas. La idea es estar en presencia — lo cual no excluye la reflexión, sino que la ancla en el instante actual."><span class="option-letter">A</span><span class="option-text">Que las mejores decisiones son las espontáneas — reflexionar demasiado convierte los pensamientos en pensaciones</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. El capítulo no propone evitar las decisiones importantes. Propone cambiar el estado desde el que se toman: desde presencia, no desde la urgencia o el miedo."><span class="option-letter">B</span><span class="option-text">Que es mejor evitar las decisiones importantes y dejarse llevar por lo que ocurre naturalmente</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q10')" data-feedback="Exacto. Si los pensamientos esenciales solo están disponibles en el presente, y son los de mayor calidad (perdón, creatividad, aceptación, agradecimiento), entonces las decisiones tomadas desde la presencia tienen acceso a esa inteligencia. Las tomadas desde la urgencia, el miedo o la proyección al futuro operan desde pensaciones — no desde pensamientos esenciales."><span class="option-letter">C</span><span class="option-text">Que las decisiones tomadas desde la presencia tienen acceso a pensamientos esenciales — las tomadas desde la urgencia o el miedo operan solo con pensaciones</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. El capítulo no propone que las decisiones grupales sean superiores. El acoplamiento entre cerebros es otro concepto relacionado con el aprendizaje, pero no aplica directamente aquí."><span class="option-letter">D</span><span class="option-text">Que las decisiones deberían tomarse en grupo para combinar la presencia de varios cerebros simultáneamente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q10"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q11')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q10" onclick="goTo('q11')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card" id="q11">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 11 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">David del Rosario afirma: «No es lo mismo vivir la vida que vivir la vida siendo conscientes de cómo funcionan nuestra mente y nuestro organismo». ¿Qué diferencia concreta propone el capítulo entre esas dos formas de vivir?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. El capítulo no propone que una vida sea más fácil que otra. Propone que una es más libre — la distinción es de calidad de presencia, no de dificultad."><span class="option-letter">A</span><span class="option-text">Que quien conoce su mente vive con menos estrés y toma decisiones más fáciles</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. Conocer la mente no es sinónimo de éxito económico o social en el sentido convencional. El capítulo usa esos ejemplos (ser buen padre, buena pareja, éxito económico o espiritual) para señalar que todos esos objetivos requieren el mismo instrumento que no conocemos."><span class="option-letter">B</span><span class="option-text">Que quien conoce su mente tiene más éxito económico y relaciones más satisfactorias</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q11')" data-feedback="Exacto. El capítulo señala: «Si queremos ser buenos padres o buenas parejas, si pretendemos ser felices o alcanzar el éxito económico o espiritual, vamos a tener que hacerlo con la mente y con el organismo que cada uno tenemos. ¡Y no sabemos cómo funciona!» La diferencia es que sin esa conciencia, actuamos desde patrones automáticos sin saberlo."><span class="option-letter">C</span><span class="option-text">Que sin conocer la mente, uno actúa desde patrones automáticos sin saberlo — con esa conciencia, las mismas acciones se hacen desde libertad y no desde reacción</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. El capítulo no propone que la vida consciente esté libre de emociones difíciles. Al contrario: la honestidad implica ver las emociones tal como son, incluso las incómodas."><span class="option-letter">D</span><span class="option-text">Que quien conoce su mente elimina las emociones negativas y vive en un estado de paz permanente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q11"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q12')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q11" onclick="goTo('q12')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card" id="q12">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 12 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El capítulo propone que «la paz es un acto de empatía de uno mismo con la humanidad». Si la honestidad es empatía con uno mismo y la paz es empatía con la humanidad, ¿qué hilo conceptual une ambas ideas?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. El capítulo no propone que la paz sea una consecuencia directa o automática de ser honesto. Son dos movimientos distintos — aunque conectados por la misma lógica."><span class="option-letter">A</span><span class="option-text">Que la paz es la consecuencia directa de la honestidad — si eres honesto, automáticamente accedes a la paz</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q12')" data-feedback="Exacto. Ambas son actos de empatía que van en dirección creciente: primero uno mismo, luego la humanidad. La honestidad abre la percepción interna; la paz es esa misma apertura extendida hacia los otros. Ambas requieren el mismo movimiento básico: ver sin huir, sin negociar, sin disfrazar."><span class="option-letter">B</span><span class="option-text">Que ambas son movimientos de empatía sin negociación — la honestidad es hacia adentro, la paz es esa misma apertura extendida hacia los demás: primero uno mismo, luego la humanidad</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. El capítulo no propone una jerarquía donde la paz sea más importante que la honestidad. Las presenta como dimensiones del mismo movimiento, no como niveles de una escala."><span class="option-letter">C</span><span class="option-text">Que la paz es superior a la honestidad porque trasciende lo individual y alcanza lo colectivo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. El capítulo no propone que la honestidad sea suficiente para la paz social. Señala una conexión más profunda entre ambas — no como pasos de un proceso sino como expresiones de la misma apertura en distintas escalas."><span class="option-letter">D</span><span class="option-text">Que si cada persona individual practica la honestidad consigo misma, la paz social emerge automáticamente como resultado</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q12"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="showResults()">Ver resultados</button>
+        <button class="btn-nav btn-next" id="next-q12" onclick="showResults()">Ver mis resultados ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="results">
+    <div class="results-header">
+      <div class="results-score-ring">
+        <svg class="score-ring-svg" viewBox="0 0 116 116">
+          <circle cx="58" cy="58" r="52" class="score-ring-circle" id="ring-circle"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="results-score-number" id="score-num">0</div>
+        <div class="results-score-total">de 12</div>
+      </div>
+      <div class="results-title" id="results-title">—</div>
+      <div class="results-msg" id="results-msg">—</div>
+    </div>
+    <div class="results-body">
+      <div class="results-breakdown">
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-correct">0</div>
+          <div class="breakdown-label">Correctas</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-wrong">0</div>
+          <div class="breakdown-label">Incorrectas</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-skipped">0</div>
+          <div class="breakdown-label">Omitidas</div>
+        </div>
+      </div>
+      <div class="results-message" id="results-message">—</div>
+      <button class="btn-restart" onclick="restart()">Volver a intentar el quiz</button>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<script>
+const TOTAL = 12;
+let score = 0;
+let answered = 0;
+let skipped = 0;
+let wrong = 0;
+let current = 1;
+
+function answer(btn, isCorrect, qId) {
+  // Disable all options in this question
+  const card = document.getElementById(qId);
+  const allBtns = card.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  // Style the chosen button
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // If wrong, highlight the correct one
+  if (!isCorrect) {
+    allBtns.forEach(b => {
+      b._correct = b.getAttribute('onclick').includes('true');
+    });
+    // Find and highlight correct
+    allBtns.forEach(b => {
+      if (b.getAttribute('onclick').includes('true,')) {
+        b.classList.add('correct');
+      }
+    });
+    wrong++;
+  } else {
+    score++;
+  }
+
+  answered++;
+
+  // Show feedback
+  const fb = document.getElementById('fb-' + qId);
+  fb.classList.add(isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = `<div class="feedback-label">${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}</div><p class="feedback-text">${btn.dataset.feedback}</p>`;
+
+  // Show next button
+  const nextBtn = document.getElementById('next-' + qId);
+  if (nextBtn) nextBtn.classList.add('visible');
+
+  updateProgress();
+}
+
+function skipTo(nextId) {
+  skipped++;
+  goTo(nextId);
+}
+
+function goTo(nextId) {
+  // Hide current
+  document.getElementById('q' + current).classList.remove('active');
+  current++;
+  // Show next
+  const nextCard = document.getElementById(nextId);
+  if (nextCard) {
+    nextCard.classList.add('active');
+    nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = answered + skipped;
+  const pct = (done / TOTAL) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-count').textContent = done + ' de ' + TOTAL;
+}
+
+function showResults() {
+  // Hide last card
+  document.getElementById('q12').classList.remove('active');
+
+  const res = document.getElementById('results');
+  res.classList.add('active');
+  res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Animate score
+  const scoreEl = document.getElementById('score-num');
+  let s = 0;
+  const interval = setInterval(() => {
+    if (s >= score) { clearInterval(interval); return; }
+    s++;
+    scoreEl.textContent = s;
+  }, 80);
+
+  // Ring animation
+  const circumference = 326.7;
+  const offset = circumference - (score / TOTAL) * circumference;
+  setTimeout(() => {
+    document.getElementById('ring-circle').style.strokeDashoffset = offset;
+  }, 200);
+
+  // Breakdown
+  document.getElementById('bd-correct').textContent = score;
+  document.getElementById('bd-wrong').textContent = wrong;
+  document.getElementById('bd-skipped').textContent = skipped + (TOTAL - answered - skipped);
+
+  // Title and message
+  const pct = score / TOTAL;
+  let title, msg, message;
+  if (pct >= 0.9) {
+    title = '¡Investigador del presente!';
+    msg = 'Dominas el capítulo con profundidad y precisión.';
+    message = 'Has demostrado una comprensión sólida de los conceptos centrales: la confianza que no negocia, la honestidad biológica y la identidad más allá del cuerpo. El siguiente paso es llevar esas comprensiones al campo de tu cotidianidad — que es exactamente lo que propone el Tercer Espacio.';
+  } else if (pct >= 0.7) {
+    title = 'Buen trabajo';
+    msg = 'Tienes las ideas principales — hay matices por afinar.';
+    message = 'Captas bien el espíritu del capítulo. Algunas distinciones conceptuales — especialmente entre confianza genuine y confianza negociada, o entre honestidad biológica y honestidad moral — merecen una segunda lectura. El debate en taller te ayudará a aterrizarlas.';
+  } else if (pct >= 0.5) {
+    title = 'Sigue investigando';
+    msg = 'Hay conceptos que vale la pena revisar antes del taller.';
+    message = 'Tienes una comprensión parcial del capítulo. Las preguntas incorrectas son una guía: revisa los conceptos de red neuronal por defecto, pensamientos esenciales y la distinción entre confianza y miedo. Volver al texto antes del taller te dará mucho más material para la conversación.';
+  } else {
+    title = 'Una posibilidad abierta';
+    msg = 'El capítulo tiene más profundidad de lo que parece a primera lectura.';
+    message = 'No te preocupes — los conceptos de este capítulo son contraintuitivos por diseño. El libro propone que cualquier creencia se desvanece cuando la experimentas. El taller es el espacio para hacer exactamente eso. Te sugerimos releer la Conversación 9 antes de la sesión.';
+  }
+
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-msg').textContent = msg;
+  document.getElementById('results-message').textContent = message;
+
+  // Progress to 100%
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-count').textContent = TOTAL + ' de ' + TOTAL;
+}
+
+function restart() {
+  score = 0; answered = 0; skipped = 0; wrong = 0; current = 1;
+
+  // Reset all cards
+  document.querySelectorAll('.q-card').forEach(c => {
+    c.classList.remove('active');
+    c.querySelectorAll('.option-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct','wrong');
+    });
+    c.querySelectorAll('.feedback-box').forEach(f => {
+      f.classList.remove('correct','wrong');
+      f.innerHTML = '';
+    });
+    c.querySelectorAll('.btn-next').forEach(n => n.classList.remove('visible'));
+  });
+
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('q1').classList.add('active');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-count').textContent = '0 de 12';
+  document.getElementById('ring-circle').style.strokeDashoffset = '326.7';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
