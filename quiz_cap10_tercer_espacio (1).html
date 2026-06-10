@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Conversación 10 · Tercer Espacio</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Forum&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --marron:     #514236;
+    --teal:       #2F5D62;
+    --teal2:      #4A6D70;
+    --gold:       #C4956A;
+    --cream:      #F5F0EB;
+    --cream2:     #F0EBE5;
+    --night:      #1A232E;
+    --correct:    #2F5D62;
+    --wrong:      #8B3A3A;
+    --correct-bg: #E8F2F3;
+    --wrong-bg:   #F5E8E8;
+  }
+
+  body {
+    background: var(--cream);
+    font-family: 'Jost', sans-serif;
+    color: var(--night);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--marron);
+    padding: 22px 40px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header-text { flex: 1; }
+  .header-brand {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 2px;
+  }
+  .header-sub {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #2F5D62 0%, #1e3d40 100%);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(196,149,106,0.12);
+    pointer-events: none;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: 40px; bottom: -60px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.06);
+    pointer-events: none;
+  }
+  .cap-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(196,149,106,0.4);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Jost', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    max-width: 500px;
+  }
+  .hero-subtitle {
+    font-family: 'Forum', serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    margin-bottom: 28px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.65);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .meta-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: var(--cream2);
+    padding: 16px 40px;
+    border-bottom: 1px solid #e0d8d0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal2);
+  }
+  .progress-count {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--marron);
+  }
+  .progress-track {
+    height: 4px;
+    background: #ddd8d2;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── MAIN ── */
+  .main-wrap {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px 24px 0;
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(81,66,54,0.09);
+    display: none;
+    animation: fadeUp 0.35s ease;
+  }
+  .q-card.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-card-header {
+    background: var(--teal);
+    padding: 20px 28px 18px;
+  }
+  .q-type-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .q-number {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+  }
+  .q-type-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .badge-comprension { background: rgba(196,149,106,0.3); color: var(--gold); }
+  .badge-inferencia  { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); }
+  .badge-vocabulario { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.65); }
+
+  .q-text {
+    font-family: 'Forum', serif;
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.6;
+  }
+
+  .q-quote {
+    background: rgba(0,0,0,0.18);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    margin: 14px 0 0;
+    border-radius: 0 3px 3px 0;
+  }
+  .q-quote p {
+    font-family: 'Forum', serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  .q-card-body { padding: 24px 28px 28px; }
+
+  /* ── OPTIONS ── */
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--cream);
+    border: 1.5px solid #ddd8d0;
+    border-radius: 4px;
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    font-family: 'Jost', sans-serif;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--teal2);
+    background: #edf5f6;
+  }
+  .option-letter {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #e0dbd5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: var(--marron);
+    transition: all 0.2s;
+    margin-top: 1px;
+  }
+  .option-text {
+    font-size: 14px;
+    color: var(--night);
+    line-height: 1.55;
+  }
+  .option-btn.correct { border-color: var(--correct); background: var(--correct-bg); }
+  .option-btn.correct .option-letter { background: var(--correct); color: #fff; }
+  .option-btn.wrong   { border-color: var(--wrong);   background: var(--wrong-bg); }
+  .option-btn.wrong   .option-letter { background: var(--wrong);   color: #fff; }
+  .option-btn:disabled { cursor: default; }
+
+  /* ── FEEDBACK ── */
+  .feedback-box {
+    display: none;
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 4px;
+    animation: fadeUp 0.3s ease;
+  }
+  .feedback-box.correct { background: var(--correct-bg); border-left: 3px solid var(--correct); display: block; }
+  .feedback-box.wrong   { background: var(--wrong-bg);   border-left: 3px solid var(--wrong);   display: block; }
+  .feedback-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .feedback-box.correct .feedback-label { color: var(--correct); }
+  .feedback-box.wrong   .feedback-label { color: var(--wrong); }
+  .feedback-text {
+    font-family: 'Forum', serif;
+    font-size: 14px;
+    color: var(--night);
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e8e0d8;
+  }
+  .btn-nav {
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-next {
+    background: var(--marron);
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, background 0.2s;
+  }
+  .btn-next.visible { opacity: 1; pointer-events: all; }
+  .btn-next:hover { background: var(--teal); }
+  .btn-skip {
+    background: transparent;
+    color: var(--teal2);
+    border: 1px solid var(--teal2);
+    font-size: 11px;
+  }
+  .btn-skip:hover { background: var(--cream2); }
+
+  /* ── RESULTS ── */
+  .results-card {
+    display: none;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 20px rgba(81,66,54,0.09);
+    animation: fadeUp 0.4s ease;
+  }
+  .results-card.active { display: block; }
+  .results-header {
+    background: var(--teal);
+    padding: 36px 40px;
+    text-align: center;
+  }
+  .results-score-ring {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    border: 3px solid rgba(196,149,106,0.25);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .results-score-number { font-size: 36px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .results-score-total  { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .results-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .results-msg   { font-family: 'Forum', serif; font-size: 14px; color: rgba(255,255,255,0.55); font-style: italic; }
+  .results-body  { padding: 32px 40px; }
+  .results-breakdown {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .breakdown-item { background: var(--cream); border-radius: 4px; padding: 16px; text-align: center; }
+  .breakdown-num   { font-size: 24px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+  .breakdown-label { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--marron); opacity: 0.7; }
+  .results-message {
+    font-family: 'Forum', serif;
+    font-size: 15px;
+    color: var(--night);
+    line-height: 1.7;
+    text-align: center;
+    padding: 20px 24px;
+    background: var(--cream2);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 4px 4px 0;
+    margin-bottom: 24px;
+  }
+  .btn-restart {
+    display: block;
+    width: 100%;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 14px;
+    border-radius: 4px;
+    border: none;
+    background: var(--marron);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-restart:hover { background: var(--teal); }
+
+  .score-ring-svg { position: absolute; top: -3px; left: -3px; width: 116px; height: 116px; transform: rotate(-90deg); }
+  .score-ring-circle { fill: none; stroke: var(--gold); stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="6" r="2.5" fill="#C4956A" opacity="0.9"/>
+    <path d="M18 9 C14 13 9 16 9 22 C9 28 13 32 18 32 C23 32 27 28 27 22 C27 16 22 13 18 9Z" stroke="#C4956A" stroke-width="1.2" fill="none" opacity="0.8"/>
+    <path d="M13 19 C13 19 15 21 18 21 C21 21 23 19 23 19" stroke="#C4956A" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+  <div class="header-text">
+    <div class="header-brand">Spring Up · Atelier de Vida</div>
+    <div class="header-sub">Tercer Espacio · La Biología del Presente</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="cap-badge">· Conversación 10 ·</div>
+  <h1 class="hero-title">Drexler y la Física de la Personalidad</h1>
+  <p class="hero-subtitle">La conexión que nos une a los demás y al universo</p>
+  <div class="hero-meta">
+    <span class="meta-pill"><span class="meta-dot"></span>12 preguntas</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Comprensión · Inferencia · Vocabulario</span>
+    <span class="meta-pill"><span class="meta-dot"></span>Responde a tu ritmo</span>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-row">
+    <span class="progress-label">Progreso</span>
+    <span class="progress-count" id="prog-count">0 de 12</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- Q1 -->
+  <div class="q-card active" id="q1">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 1 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">En el sueño de las naranjas, ¿qué cambia en Sergi Torres en el momento en que su acompañante le dice «date cuenta de que estás en un sueño»?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. El sueño no desaparece al reconocerse — al contrario, Sergi sigue soñando. Lo que cambia es el nivel de consciencia dentro de él, no la experiencia en sí misma."><span class="option-letter">A</span><span class="option-text">El sueño desaparece y Sergi despierta al mundo real inmediatamente</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q1')" data-feedback="Exacto. Al reconocer que estaba soñando, Sergi comprende que «esa ansiedad era falsa. Sin embargo, la estaba viviendo como si fuera física». El cuerpo expresaba como real algo que era un espejismo mental. El reconocimiento no elimina el sueño — cambia la relación con él."><span class="option-letter">B</span><span class="option-text">Toma conciencia de que la ansiedad que sentía era un espejismo mental, aunque su cuerpo la vivía como física y real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. La ansiedad no se transforma en calma de forma automática. El capítulo describe que la ansiedad «era falsa» pero el cuerpo la vivía como real — la toma de consciencia es el primer movimiento, no la resolución."><span class="option-letter">C</span><span class="option-text">La ansiedad del sueño se convierte en calma porque comprende que nada es real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q1')" data-feedback="No. Dentro del sueño Sergi no puede controlar todo a voluntad — de hecho, al final dice «aún no puedo volar» y eso lo despierta. El reconocimiento no es omnipotencia."><span class="option-letter">D</span><span class="option-text">Gana control total sobre el sueño y puede modificarlo a voluntad desde ese momento</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q1"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q2')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q1" onclick="goTo('q2')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 2 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Qué dice el acompañante del sueño cuando Sergi Torres ya está despierto en Bogotá y toca la pared?</p>
+      <div class="q-quote">
+        <p>«No puedes cruzar la pared con la mano porque crees que no la puedes cruzar, igual que la ventana del sueño. No te das cuenta de que aunque crees estar despierto, en verdad, sigues en un sueño al que llamas vigilia.»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. El acompañante no dice que Sergi tenga poderes latentes. Su mensaje es más radical: que la realidad entera — incluida la pared — es construida por las creencias del cerebro, igual que lo era el cristal del sueño."><span class="option-letter">A</span><span class="option-text">Que Sergi tiene poderes latentes que podría desarrollar si entrena su mente suficientemente</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. El acompañante no cuestiona que la pared exista materialmente — cuestiona la naturaleza de la experiencia que Sergi construye alrededor de ella. La distinción es sutil pero esencial."><span class="option-letter">B</span><span class="option-text">Que la pared no existe realmente — es solo una ilusión colectiva sin base material</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q2')" data-feedback="Exacto. El mensaje del acompañante es que la vigilia es otro sueño: «Sigues dentro de una frecuencia que emite tu cerebro y que conforma un conjunto de imágenes mentales con las que tú construyes una realidad en la que te ves a ti mismo como un personaje. Aquel que tú crees ser a partir de tus limitaciones físicas no es más que el producto de meras creencias.»"><span class="option-letter">C</span><span class="option-text">Que la vigilia es también un sueño: el cerebro emite una frecuencia que construye imágenes mentales, y lo que creemos ser es producto de creencias, no de la realidad en sí</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q2')" data-feedback="No. El acompañante no propone técnicas de meditación. Su mensaje es un quiebre ontológico: no distingue entre el estado del sueño y el estado de vigilia en términos de su naturaleza como construcción mental."><span class="option-letter">D</span><span class="option-text">Que Sergi necesita practicar meditación para aprender a cruzar los límites que la mente impone</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q2"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q3')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q2" onclick="goTo('q3')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 3 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">En la «física de la personalidad», ¿qué representa la luz blanca del sol y qué representa el color rojo que vemos en el tomate?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. Es exactamente al revés. La luz blanca del sol representa la conciencia universal — lo que existe completo antes de la personalidad. El rojo reflejado es lo que la personalidad proyecta hacia afuera."><span class="option-letter">A</span><span class="option-text">La luz blanca representa la personalidad individual y el color rojo representa la conciencia universal</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q3')" data-feedback="Correcto. El texto lo dice con precisión: «La luz blanca procedente del sol representa la conciencia universal. La energía absorbida de la conciencia universal es aquella que Sergi utiliza para construir su personalidad.» El rojo reflejado — lo que «vemos» — es la personalidad proyectada, no la totalidad del ser."><span class="option-letter">B</span><span class="option-text">La luz blanca representa la conciencia universal y el color rojo reflejado representa la personalidad que construimos al absorber y rechazar partes de esa conciencia</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. La analogía no trata sobre la mente consciente vs. inconsciente. Trata sobre la relación entre la conciencia universal (totalidad) y la personalidad (la porción absorbida y reflejada)."><span class="option-letter">C</span><span class="option-text">La luz blanca representa la mente consciente y el color rojo representa los contenidos del inconsciente</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q3')" data-feedback="No. La analogía no es sobre el pasado y el futuro. Es una analogía espacial/óptica sobre cómo la conciencia universal se convierte en personalidad individual a través de la absorción y el reflejo."><span class="option-letter">D</span><span class="option-text">La luz blanca representa el potencial futuro y el color rojo representa la identidad formada por el pasado</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q3"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q4')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q3" onclick="goTo('q4')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 4 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">¿Qué propone el capítulo sobre el «ángulo de absorción total» de la personalidad?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. El capítulo no habla de absorber más información del entorno con los sentidos. El ángulo de absorción total es una metáfora de disolver la separación entre personalidad y conciencia universal — no de ampliar la percepción sensorial."><span class="option-letter">A</span><span class="option-text">Que existe una técnica para absorber más información del entorno activando los sentidos al máximo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. El capítulo lo presenta como una posibilidad — «tal vez exista» — no como un estado reservado a personas iluminadas o místicos. Es una apertura, no una categoría excluyente."><span class="option-letter">B</span><span class="option-text">Que solo ciertos seres iluminados pueden alcanzar ese estado de absorción total de la conciencia universal</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q4')" data-feedback="Exacto. El texto lo describe con precisión: «Tal vez exista, igual que ocurre en la física óptica, un ángulo por el cual Sergi o David absorben por completo la conciencia universal, un ángulo en el que la personalidad deja de ser el centro de la experiencia humana, donde la punta de iceberg se siente un iceberg sostenido por el mar.»"><span class="option-letter">C</span><span class="option-text">Que quizás existe un ángulo en el que la personalidad deja de ser el centro de la experiencia y la punta de iceberg se siente sostenida por el mar — es decir, la consciencia personal se disuelve en la conciencia universal</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q4')" data-feedback="No. El ángulo de absorción total no es una pérdida de identidad traumática sino una expansión de consciencia. El capítulo lo presenta como una posibilidad liberadora, no como algo peligroso."><span class="option-letter">D</span><span class="option-text">Que absorber toda la conciencia universal es peligroso porque implica la pérdida total de la identidad personal</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q4"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q5')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q4" onclick="goTo('q5')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 5 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">En la metáfora del iceberg y el mar, ¿por qué el iceberg que solo se conoce a sí mismo teme derretirse?</p>
+      <div class="q-quote">
+        <p>«Un iceberg que solo es consciente de sí mismo teme derretirse porque cree que desaparece al hacerlo. En cambio, cuando eres consciente del mar sabes que cuando te derrites vuelves a ser mar, que es lo que fuiste antes de conformarte como iceberg.»</p>
+      </div>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. El miedo a derretirse no es por el frío — es una metáfora sobre la identidad y la consciencia, no sobre las condiciones físicas del hielo."><span class="option-letter">A</span><span class="option-text">Porque el frío es su elemento natural y el calor representa una amenaza externa real</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="Incompleto. El dolor no aparece en la metáfora del capítulo. La clave es la creencia de desaparición, no el sufrimiento físico del proceso."><span class="option-letter">B</span><span class="option-text">Porque el proceso de derretirse es doloroso y prolongado en el tiempo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q5')" data-feedback="Exacto. La clave está en «cree que desaparece». Si la identidad se reduce a la forma-iceberg, perder esa forma equivale a la extinción. Pero si se es consciente del mar, derretirse es un retorno — no una desaparición. La misma lógica aplica a la muerte: «La muerte deja de ser una amenaza psicológica. Dentro de los confines de nuestra realidad concreta, nada muere, todo se transforma.»"><span class="option-letter">C</span><span class="option-text">Porque al identificarse solo con su forma-iceberg, cree que derretirse equivale a desaparecer — sin saber que volvería a ser el mar del que proviene</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q5')" data-feedback="No. La metáfora no tiene nada que ver con los demás icebergs. El temor es existencial — es el miedo a la propia extinción, no al juicio ajeno."><span class="option-letter">D</span><span class="option-text">Porque si se derrite perderá su posición entre los demás icebergs y ya no podrá diferenciarse de ellos</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q5"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q6')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q5" onclick="goTo('q6')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 6 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">Según la etimología que cita el capítulo, ¿qué significa literalmente la palabra «transformación»?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. «Cambio radical» es una interpretación coloquial, no la etimología que el capítulo trabaja. El libro va a la raíz latina para mostrar que transformación no implica desaparición sino movimiento entre formas."><span class="option-letter">A</span><span class="option-text">Cambio radical e irreversible en la estructura de algo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. «Trans» no significa «de nuevo» — significa «de un lado al otro» o «más allá de». «Formāre» no es «crear» sino «la figura» o «la imagen»."><span class="option-letter">B</span><span class="option-text">Volver a crear una nueva forma desde cero</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q6')" data-feedback="Exacto. El capítulo lo explicita: «La palabra transformación proviene etimológicamente de transformāre, que significa literalmente — trans — "de un lado al otro" o "más allá de" — formāre — "la figura" o "la imagen".» De ahí que la muerte sea un movimiento de formas, no una desaparición."><span class="option-letter">C</span><span class="option-text">«De un lado al otro» o «más allá de» la figura o imagen — un movimiento entre formas, no una desaparición</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q6')" data-feedback="No. «Trascender» implica ir más allá de forma abstracta, pero «transformación» en la etimología del capítulo es más concreto: es un movimiento entre formas — de un lado al otro de la figura."><span class="option-letter">D</span><span class="option-text">Trascender los límites conocidos para alcanzar un estado superior de existencia</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q6"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q7')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q6" onclick="goTo('q7')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q7">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 7 / 12</span>
+        <span class="q-type-badge badge-vocabulario">Vocabulario</span>
+      </div>
+      <p class="q-text">¿Quién es el doctor Eben Alexander y por qué el capítulo lo cita?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. David del Rosario es el neurocientífico del libro. Eben Alexander es un neurocirujano de Harvard — no el mismo personaje, y con una historia específica de coma que lo hace relevante para el argumento."><span class="option-letter">A</span><span class="option-text">Es el coautor del libro, responsable de la parte científica del argumento sobre la conciencia</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. Drexler es el músico uruguayo mencionado al inicio del capítulo para hablar de la física de la personalidad. Alexander es un caso distinto — un neurocirujano con una experiencia de coma documentada."><span class="option-letter">B</span><span class="option-text">Es el músico uruguayo Jorge Drexler, que da nombre al capítulo por sus canciones sobre identidad</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q7')" data-feedback="Exacto. El capítulo lo describe así: «Un neurocirujano estadounidense profesor de la Escuela de Medicina de Harvard que en 2008 entró en coma por una rara meningitis que destruyó gran parte de su cerebro. Al despertar, describió haber sido consciente de un campo de conciencia durante el período en que su cerebro era totalmente disfuncional» — lo que lleva a la pregunta: ¿es el cerebro el origen de la conciencia o solo una antena?"><span class="option-letter">C</span><span class="option-text">Es un neurocirujano de Harvard que entró en coma en 2008 y, al despertar, reportó haber sido consciente cuando su cerebro era disfuncional — lo que abre la pregunta de si la conciencia existe más allá del cerebro</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q7')" data-feedback="No. David Chalmers es el filósofo mencionado al final del capítulo que nombró a la conciencia el «problema difícil». Eben Alexander es el neurocirujano con la experiencia de coma."><span class="option-letter">D</span><span class="option-text">Es el filósofo que definió la conciencia como «el problema difícil» de la filosofía de la mente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q7"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q8')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q7" onclick="goTo('q8')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q8">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 8 / 12</span>
+        <span class="q-type-badge badge-comprension">Comprensión</span>
+      </div>
+      <p class="q-text">El capítulo propone que el cerebro podría ser una «antena» y no el origen de la conciencia. ¿Qué cambiaría en la comprensión del ser humano si eso fuera cierto?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. El capítulo no propone que la conciencia sea eterna en el sentido religioso tradicional. La propuesta es más específica: que la conciencia no está clausurada dentro del cráneo, sino que el cerebro accede a un campo de conciencia más amplio."><span class="option-letter">A</span><span class="option-text">Que el alma humana es inmortal y sobrevive físicamente al cuerpo tras la muerte</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. Aunque David del Rosario menciona el campo electromagnético del sistema nervioso, el capítulo no reduce la conciencia a señales eléctricas medibles. La propuesta va más allá de la física convencional."><span class="option-letter">B</span><span class="option-text">Que la conciencia sería simplemente una señal eléctrica que el cerebro transmite al exterior</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q8')" data-feedback="Exacto. Sergi Torres lo dice con claridad: «De 'la mente está dentro de la cabeza' a 'el cuerpo está dentro de la mente'. ¡Es justo al revés!» Si el cerebro es una antena que recibe conciencia universal, la mente no está clausurada en el cráneo — y esto cambia radicalmente la comprensión de la identidad, la enfermedad y la conexión entre personas."><span class="option-letter">C</span><span class="option-text">Que el paradigma se invierte: no es que la mente esté dentro de la cabeza, sino que el cuerpo está dentro de la mente — y la conciencia no estaría clausurada en el cráneo sino conectada a un campo más amplio</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q8')" data-feedback="No. El capítulo no propone que el cerebro sea prescindible. Propone una reinterpretación de su función: de productor de conciencia a receptor-antena de un campo de conciencia universal."><span class="option-letter">D</span><span class="option-text">Que el cerebro sería prescindible para la experiencia consciente y podría ser reemplazado por tecnología</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q8"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q9')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q8" onclick="goTo('q9')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q9">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 9 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">Si cada persona construye su personalidad rechazando una parte distinta de la conciencia universal, ¿qué implicaría esto para la manera en que reaccionamos con intensidad ante ciertos rasgos de otras personas?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. Aunque la proyección psicológica es un concepto relacionado, el capítulo va más lejos: no solo es que proyectamos lo que rechazamos en nosotros — es que todas las personas son expresiones distintas de la misma conciencia, y lo que rechazamos en otro es parte de la misma fuente de la que todos venimos."><span class="option-letter">A</span><span class="option-text">Que las reacciones intensas son simples proyecciones psicológicas sin relación con la conciencia universal</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. El capítulo no propone que debamos evitar relacionarnos con personas que nos generan reacciones. Al contrario — reconocer que «todos son expresiones distintas de la misma conciencia» abre una relación más amplia, no más restrictiva."><span class="option-letter">B</span><span class="option-text">Que deberíamos evitar relacionarnos con personas que nos generan reacciones muy intensas</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q9')" data-feedback="Exacto. Si la personalidad es la parte de la conciencia universal que cada uno absorbe y la que rechaza es lo que refleja, lo que nos irrita o atrae de otros podría ser exactamente la parte de la conciencia universal que nosotros hemos decidido no absorber. El capítulo lo dice: «Sergi, Sandra Bullock, el lector, Mr. Bean y David rechazamos una parte distinta de la conciencia universal para poder ser nosotros mismos.» Y al final: «David, Sergi, el doctor Eben Alexander, Nano, su madre, su tía o George Clooney son expresiones distintas de la misma conciencia.»"><span class="option-letter">C</span><span class="option-text">Que lo que nos genera reacción en otro podría ser exactamente la parte de la conciencia universal que nosotros elegimos no absorber — y que en el otro reconocemos, aunque no la hayamos integrado</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q9')" data-feedback="No. El capítulo no propone que las reacciones intensas sean necesariamente señal de compatibilidad. La física de la personalidad describe un mecanismo de construcción de identidad, no un criterio para elegir vínculos."><span class="option-letter">D</span><span class="option-text">Que las personas que nos generan reacciones muy intensas son aquellas con quienes somos más compatibles energéticamente</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q9"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q10')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q9" onclick="goTo('q10')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q10">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 10 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">En el sueño de «Nano», la madre puede recordar el nombre de la tía aunque Nano —el supuesto «arquitecto del sueño»— no puede. ¿Qué dice el capítulo sobre dónde estaba esa información?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. El olvido no era involuntario ni random — el capítulo propone que «la mente de Nano ocultó información al personaje Nano y no a su madre». Hay una lógica en el acceso diferencial a la información."><span class="option-letter">A</span><span class="option-text">Que la memoria falla de forma aleatoria en los sueños porque el cerebro no consolida recuerdos durante el sueño</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. La madre es un personaje proyectado por la mente de Nano, no una entidad independiente con acceso a sus propios recuerdos. Eso hace el ejemplo aún más revelador: la información estaba disponible en la misma mente que construyó el sueño."><span class="option-letter">B</span><span class="option-text">Que la madre tenía acceso a sus propios recuerdos independientes, distintos de los de Nano</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q10')" data-feedback="Exacto. David del Rosario lo explica: «La mente de Nano ocultó información al personaje Nano y no a su madre — un personaje proyectado por su propia mente. La información estaba disponible en algún lugar. Ese lugar es la conciencia universal. Es la conciencia que Nano limita para dar vida a sus creencias personales.» La identidad individual restringe el acceso a la conciencia que la construye."><span class="option-letter">C</span><span class="option-text">Que la información estaba en la conciencia universal — Nano la limitó al construir su identidad personal, pero seguía disponible en el campo que generó a todos los personajes del sueño</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q10')" data-feedback="No. El capítulo no propone que haya una zona inconsciente separada. La distinción relevante es entre la consciencia individual (limitada por las creencias) y la conciencia universal (de la que emerge todo el sueño, incluida la madre y su información)."><span class="option-letter">D</span><span class="option-text">Que la información estaba en el inconsciente de Nano, que su yo consciente no podía acceder durante el sueño</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q10"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q11')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q10" onclick="goTo('q11')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card" id="q11">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 11 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El capítulo dice que la conciencia universal es «la fuente de vida» pero que la tememos por ser desconocida y la vemos como una amenaza a nuestra individualidad. ¿Qué patrón repite esto respecto a la biología de la supervivencia descrita en capítulos anteriores?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. La conciencia universal no es una amenaza real — el capítulo es explícito en que es «la fuente de vida». El miedo no proviene de un peligro objetivo sino de la misma lógica de supervivencia que teme lo desconocido."><span class="option-letter">A</span><span class="option-text">Que la conciencia universal representa un peligro real que el cerebro detecta correctamente como amenaza</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q11')" data-feedback="Exacto. La biología de la supervivencia rechaza lo que no encaja en el modelo mental conocido — aunque eso que rechaza sea la fuente de vida. Es el mismo mecanismo: convertir en amenaza lo que no se reconoce. El texto lo dice: «Nuestra fuente de vida, la conciencia universal, pasa a ser vista como una amenaza a nuestra individualidad.» El mismo patrón del Capítulo 1 — rechazar lo que nos podría sanar."><span class="option-letter">B</span><span class="option-text">Que es el mismo patrón de supervivencia: convertir en amenaza lo que no encaja en el modelo conocido, aunque sea la fuente de vida — igual que el organismo rechaza experiencias que podrían liberarlo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. Aunque es cierto que la sociedad refuerza ciertas creencias, el capítulo no pone el énfasis en lo cultural sino en el mecanismo neurobiológico de supervivencia que opera antes de cualquier condicionamiento social específico."><span class="option-letter">C</span><span class="option-text">Que es un patrón aprendido culturalmente que varía de persona a persona y no tiene base neurológica</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q11')" data-feedback="No. El capítulo no propone que la solución sea un proceso gradual de familiarización. La propuesta es más directa: reconocer que la identidad que tememos perder es ella misma una construcción de creencias — no un hecho objetivo."><span class="option-letter">D</span><span class="option-text">Que es un miedo temporal que desaparece gradualmente a medida que la persona se familiariza con la idea</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q11"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="skipTo('q12')">Siguiente →</button>
+        <button class="btn-nav btn-next" id="next-q11" onclick="goTo('q12')">Continuar ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card" id="q12">
+    <div class="q-card-header">
+      <div class="q-type-row">
+        <span class="q-number">Pregunta 12 / 12</span>
+        <span class="q-type-badge badge-inferencia">Inferencia</span>
+      </div>
+      <p class="q-text">El capítulo cierra diciendo que «David, Sergi, el doctor Eben Alexander, Nano, su madre, su tía o George Clooney son expresiones distintas de la misma conciencia». ¿Qué cambia en la manera de relacionarse con alguien que nos cae muy mal, si se acepta esa proposición?</p>
+    </div>
+    <div class="q-card-body">
+      <ul class="options-list">
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. El capítulo no propone que debamos fingir que nos cae bien alguien que nos desagrada. Propone un cambio de perspectiva más profundo — no sobre el comportamiento sino sobre la naturaleza de la separación que percibimos."><span class="option-letter">A</span><span class="option-text">Que deberíamos fingir que nos cae bien todo el mundo para actuar en coherencia con la conciencia universal</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. La propuesta no es negar las diferencias ni disolver los límites personales en la práctica cotidiana. Es un cambio de perspectiva sobre la naturaleza de la separación, no una prescripción de conducta."><span class="option-letter">B</span><span class="option-text">Que las diferencias entre personas dejan de existir y todos los vínculos se vuelven igualmente cercanos</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,true,'q12')" data-feedback="Exacto. Si la otra persona es una expresión distinta de la misma conciencia — que absorbe y refleja partes diferentes de la misma fuente — entonces lo que nos irrita es, en algún nivel, parte de esa misma conciencia que también nos constituye. Sergi lo dice en otra parte del capítulo: «No hay un 'yo' que mira a un 'tú' ajeno a mí.» Eso no elimina el conflicto, pero cambia radicalmente su significado."><span class="option-letter">C</span><span class="option-text">Que lo que nos irrita en esa persona es una expresión distinta de la misma fuente que nos constituye — no hay un «tú» ajeno a mí, lo que cambia el significado del conflicto sin necesariamente eliminarlo</span></button></li>
+        <li><button class="option-btn" onclick="answer(this,false,'q12')" data-feedback="No. La propuesta del capítulo no es una técnica de empatía cognitiva sino un cambio ontológico más profundo: la percepción de separación entre «yo» y «tú» es ella misma una construcción de la personalidad — no un hecho objetivo."><span class="option-letter">D</span><span class="option-text">Que debemos practicar empatía cognitiva para imaginar el punto de vista del otro antes de juzgarlo</span></button></li>
+      </ul>
+      <div class="feedback-box" id="fb-q12"></div>
+      <div class="nav-row">
+        <button class="btn-nav btn-skip" onclick="showResults()">Ver resultados</button>
+        <button class="btn-nav btn-next" id="next-q12" onclick="showResults()">Ver mis resultados ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="results">
+    <div class="results-header">
+      <div class="results-score-ring">
+        <svg class="score-ring-svg" viewBox="0 0 116 116">
+          <circle cx="58" cy="58" r="52" class="score-ring-circle" id="ring-circle"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="results-score-number" id="score-num">0</div>
+        <div class="results-score-total">de 12</div>
+      </div>
+      <div class="results-title" id="results-title">—</div>
+      <div class="results-msg" id="results-msg">—</div>
+    </div>
+    <div class="results-body">
+      <div class="results-breakdown">
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-correct">0</div>
+          <div class="breakdown-label">Correctas</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-wrong">0</div>
+          <div class="breakdown-label">Incorrectas</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-num" id="bd-skipped">0</div>
+          <div class="breakdown-label">Omitidas</div>
+        </div>
+      </div>
+      <div class="results-message" id="results-message">—</div>
+      <button class="btn-restart" onclick="restart()">Volver a intentar el quiz</button>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<script>
+const TOTAL = 12;
+let score = 0, answered = 0, skipped = 0, wrong = 0, current = 1;
+
+function answer(btn, isCorrect, qId) {
+  const card = document.getElementById(qId);
+  const allBtns = card.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    allBtns.forEach(b => {
+      if (b.getAttribute('onclick').includes('true,')) b.classList.add('correct');
+    });
+    wrong++;
+  } else {
+    score++;
+  }
+  answered++;
+
+  const fb = document.getElementById('fb-' + qId);
+  fb.classList.add(isCorrect ? 'correct' : 'wrong');
+  fb.innerHTML = `<div class="feedback-label">${isCorrect ? '✓ Correcto' : '✗ Incorrecto'}</div><p class="feedback-text">${btn.dataset.feedback}</p>`;
+
+  const nextBtn = document.getElementById('next-' + qId);
+  if (nextBtn) nextBtn.classList.add('visible');
+
+  updateProgress();
+}
+
+function skipTo(nextId) { skipped++; goTo(nextId); }
+
+function goTo(nextId) {
+  document.getElementById('q' + current).classList.remove('active');
+  current++;
+  const nextCard = document.getElementById(nextId);
+  if (nextCard) {
+    nextCard.classList.add('active');
+    nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = answered + skipped;
+  document.getElementById('prog-fill').style.width = (done / TOTAL * 100) + '%';
+  document.getElementById('prog-count').textContent = done + ' de ' + TOTAL;
+}
+
+function showResults() {
+  document.getElementById('q12').classList.remove('active');
+  const res = document.getElementById('results');
+  res.classList.add('active');
+  res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  let s = 0;
+  const scoreEl = document.getElementById('score-num');
+  const interval = setInterval(() => {
+    if (s >= score) { clearInterval(interval); return; }
+    scoreEl.textContent = ++s;
+  }, 80);
+
+  setTimeout(() => {
+    document.getElementById('ring-circle').style.strokeDashoffset =
+      326.7 - (score / TOTAL) * 326.7;
+  }, 200);
+
+  document.getElementById('bd-correct').textContent = score;
+  document.getElementById('bd-wrong').textContent = wrong;
+  document.getElementById('bd-skipped').textContent = TOTAL - answered;
+
+  const pct = score / TOTAL;
+  let title, msg, message;
+  if (pct >= 0.9) {
+    title = '¡La punta de iceberg que siente el mar!';
+    msg = 'Comprensión profunda del capítulo — listo para el taller.';
+    message = 'Has captado con precisión los conceptos más exigentes del capítulo: la física de la personalidad, el sueño de las naranjas como espejo de la vigilia y la conciencia universal como fuente común. El debate en el Tercer Espacio será tu campo de investigación.';
+  } else if (pct >= 0.7) {
+    title = 'Muy bien — las ideas centrales están claras';
+    msg = 'Algunos matices por afinar antes del taller.';
+    message = 'Tienes una comprensión sólida del capítulo. Las preguntas sobre el ángulo de absorción total y la conciencia universal como campo — no como concepto espiritual abstracto sino como propuesta neurológica — merecen una segunda lectura. El taller te dará el espacio para profundizarlas.';
+  } else if (pct >= 0.5) {
+    title = 'Base sólida — hay profundidad por descubrir';
+    msg = 'Vale la pena volver al texto antes del taller.';
+    message = 'El Capítulo 10 es uno de los más densos del libro porque mueve el argumento desde la neurociencia hacia la física y la ontología. Revisa especialmente la analogía del tomate, la metáfora del iceberg y el caso Eben Alexander. El taller será mucho más rico con esa base.';
+  } else {
+    title = 'El cristal que aún no has cruzado';
+    msg = 'Como en el sueño — una sola posibilidad abierta basta.';
+    message = 'No te preocupes — los conceptos de este capítulo son deliberadamente contraintuitivos. Proponen que lo que creemos saber sobre quiénes somos es una construcción. Eso tarda en asentarse. Releer la Conversación 10 con el material de la guía en mano te dará mucho más para llevar al taller.';
+  }
+
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-msg').textContent = msg;
+  document.getElementById('results-message').textContent = message;
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-count').textContent = TOTAL + ' de ' + TOTAL;
+}
+
+function restart() {
+  score = 0; answered = 0; skipped = 0; wrong = 0; current = 1;
+  document.querySelectorAll('.q-card').forEach(c => {
+    c.classList.remove('active');
+    c.querySelectorAll('.option-btn').forEach(b => { b.disabled = false; b.classList.remove('correct','wrong'); });
+    c.querySelectorAll('.feedback-box').forEach(f => { f.classList.remove('correct','wrong'); f.innerHTML = ''; });
+    c.querySelectorAll('.btn-next').forEach(n => n.classList.remove('visible'));
+  });
+  document.getElementById('results').classList.remove('active');
+  document.getElementById('q1').classList.add('active');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-count').textContent = '0 de 12';
+  document.getElementById('ring-circle').style.strokeDashoffset = '326.7';
+  document.getElementById('score-num').textContent = '0';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
